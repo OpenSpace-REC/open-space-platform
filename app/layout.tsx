@@ -1,8 +1,13 @@
+import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 
-
+// Use the font in the layout
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Specify the weights you need
+  display: "swap", // Optional, helps with font rendering
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,9 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={` antialiased`}
-      >
+      <body className={`${poppins.className} antialiased`}>
         {children}
       </body>
     </html>
