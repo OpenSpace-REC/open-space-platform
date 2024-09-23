@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 
 // Use the font in the layout
 const poppins = Poppins({
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-        {children}
+        <SessionProvider>
+
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );
