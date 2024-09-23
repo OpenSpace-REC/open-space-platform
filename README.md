@@ -22,22 +22,13 @@ This project uses [Auth.js](https://authjs.dev) (formerly NextAuth.js) for authe
 
 This project uses [Prisma](https://www.prisma.io) as the ORM and [PostgreSQL](https://www.postgresql.org) as the database. To set up the database, follow these steps:
 
-1. Install the Prisma CLI:
-    ```bash
-    pnpm add -D prisma
-    ```
 
-2. Initialize Prisma in your project:
-    ```bash
-    pnpm prisma init
-    ```
-
-3. Update your `.env` file with your PostgreSQL connection string:
+1. Update your `.env` file with your PostgreSQL connection string:
     ```env
     DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
     ```
 
-4. Run the Prisma migrations to set up your database schema:
+2. Run the Prisma migrations to set up your database schema:
     ```bash
     pnpm prisma migrate dev
     ```
