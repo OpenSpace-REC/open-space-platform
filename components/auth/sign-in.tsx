@@ -1,8 +1,7 @@
 "use client";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { FaGoogle } from "react-icons/fa";
 import { ReactNode } from "react";
 
 interface SignInProps {
@@ -13,9 +12,11 @@ interface SignInProps {
 
 export default function SignIn({ providerName, buttonText, children }: SignInProps) {
     const router = useRouter();
+    const {data: session} = useSession();
 
     const handleSignIn = async () => {
         const result = await signIn(providerName, { redirect: false });
+        console.log(JSON.stringify(session))
     };
 
     return (
