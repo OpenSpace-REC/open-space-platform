@@ -33,6 +33,11 @@ export default function GitHubLinkPage() {
         <main className="w-screen h-screen flex items-center justify-center">
             <Card className="bg-zinc-950 text-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-lg border border-white border-opacity-30">
                 <CardContent className="flex flex-col gap-4">
+                    {userEmail && (
+                        <div>
+                            <Input id="email" value={userEmail} readOnly className="bg-zinc-800 text-white" />
+                        </div>
+                    )}
                     {!isGithubLinked ? (
                         <Button
                             onClick={handleGitHubLink}
@@ -49,12 +54,6 @@ export default function GitHubLinkPage() {
                         </div>
                     )}
 
-                    {userEmail && (
-                        <div>
-                            <label htmlFor="email" className="text-sm font-medium mt-2">Email</label>
-                            <Input id="email" value={userEmail} readOnly className="bg-zinc-800 text-white" />
-                        </div>
-                    )}
 
                     {isGithubLinked && (
                         <Button

@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import SignIn from "@/components/auth/sign-in";
 import SignOut from "@/components/auth/sign-out";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 export default function SignUpPage() {
     const { data: session } = useSession();
@@ -16,6 +18,7 @@ export default function SignUpPage() {
     const [name, setName] = useState(""); 
     const userEmail = session?.user?.email || "";
     const googleId = session?.googleId || "";
+    const { toast } = useToast()
 
     useEffect(() => {
         console.log(JSON.stringify(session));
@@ -43,15 +46,20 @@ export default function SignUpPage() {
                 }),
             });
 
-            if (!response.ok) {
+            if (response.status === 409) {
+                toast({
+                    title: "User already exists",
+                    description: "The account associated with this email already exists.",
+                    action: <ToastAction  className="border p-1 rounded-md" altText="Login">Login</ToastAction>,
+                });
+            } else if (!response.ok) {
                 throw new Error('Network response was not ok');
+            } else {
+                const data = await response.json();
+                console.log("Success:", data);
+                router.push("/auth/github-link");
             }
 
-            const data = await response.json();
-            console.log("Success:", data);
-
-
-            router.push("/auth/github-link"); 
 
         } catch (error) {
             console.error("Error:", error); 
@@ -61,6 +69,9 @@ export default function SignUpPage() {
     return (
         <main className="w-screen h-screen flex items-center justify-center">
             <Card className="bg-zinc-950 text-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-lg border border-white border-opacity-30">
+                <CardHeader>
+                    <p className="flex items-center justify-center font-semibold text-4xl">/Open-Space</p>
+                </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                     {!session && (
                         <SignIn buttonText="Sign in with Google" providerName="google">
@@ -71,7 +82,6 @@ export default function SignUpPage() {
                     {session && (
                         <div className="flex flex-col gap-4">
                             <div>
-                                <label htmlFor="name" className="text-sm font-medium">Name</label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -79,7 +89,7 @@ export default function SignUpPage() {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="email" className="text-sm font-medium mt-2">Email</label>
+                                
                                 <Input id="email" value={userEmail} readOnly />
                             </div>
                             <Button onClick={handleConfirm} className="bg-white text-black">Confirm</Button>

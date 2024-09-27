@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "@/components/ui/toaster"
 
 // Use the font in the layout
 const poppins = Poppins({
@@ -26,6 +27,8 @@ export default function RootLayout({
         <SessionProvider>
 
           {children}
+          <Toaster />
+
         </SessionProvider>
       </body>
     </html>
