@@ -49,17 +49,9 @@ export async function GET(request: Request) {
   const userData = await userResponse.json();
 
   const email = session.user.email;
-  const updatedUser = await prisma.user.upsert({
+  const updatedUser = await prisma.user.update({
     where: { email },
-    update: {
-      githubUsername: userData.login,
-      githubProfileUrl: userData.html_url,
-      githubAvatarUrl: userData.avatar_url,
-    },
-    create: {
-      googleId: session.googleId || '',
-      name: session.user.name || '',
-      email,
+    data: {
       githubUsername: userData.login,
       githubProfileUrl: userData.html_url,
       githubAvatarUrl: userData.avatar_url,

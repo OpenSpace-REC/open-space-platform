@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FaGithub } from "react-icons/fa";
 
+
 export default function GitHubLinkPage() {
     const { data: session } = useSession();
     const router = useRouter();
@@ -65,6 +66,7 @@ export default function GitHubLinkPage() {
                     )}
                 </CardContent>
             </Card>
+
         </main>
     );
 }

@@ -46,12 +46,20 @@ export default function SignUpPage() {
                 }),
             });
 
-            if (response.status === 409) {
+            
+            if (response.status === 302) {
+                toast({
+                    description: "Link Github",
+                    
+                });
+                router.push("/auth/github-link");
+            }else if (response.status === 409) {
                 toast({
                     title: "User already exists",
-                    description: "The account associated with this email already exists.",
-                    action: <ToastAction  className="border p-1 rounded-md" altText="Login">Login</ToastAction>,
+                    description: "The account associated with this email already exists. Logging in",
+                    
                 });
+                router.push("/landing");
             } else if (!response.ok) {
                 throw new Error('Network response was not ok');
             } else {
