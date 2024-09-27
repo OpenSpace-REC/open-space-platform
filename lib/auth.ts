@@ -1,6 +1,15 @@
-import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
+import NextAuth, { Session } from "next-auth"
 import Google from "next-auth/providers/google"
+import { JWT } from "next-auth/jwt"
+
+interface ExtendedSession extends Session {
+  providers?: string[]
+  googleId?: string
+}
+
+interface ExtendedToken extends JWT {
+  googleId?: string
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -11,23 +20,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account, profile, trigger }) {
-      
-        
-        
-        if (account?.provider === "google") {
-          token.googleId = account.providerAccountId;
-        }  
-        
-
+      if (account?.provider === "google") {
+        (token as ExtendedToken).googleId = account.providerAccountId;
+      }
       return token;
     },
     async session({ session, token }) {
-      session.providers = token.providers;
-      session.googleId = token.googleId;
-      return session;
+      const extendedSession = session as ExtendedSession;
+      const extendedToken = token as ExtendedToken;
+
+      extendedSession.googleId = extendedToken.googleId;
+      return extendedSession;
     },
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user
+      const protectedPaths = ['/landing', '/profile', '/settings']
+      const isProtected = protectedPaths.some(path => nextUrl.pathname.startsWith(path))
+      
+      if (isProtected) {
+        if (isLoggedIn) return true
+        return false 
+      }
+      return true
+    }
   },
-
-
-
+  pages: {
+    signIn: '/auth/google-signin', 
+  },
 })
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/settings/:path*']
+}
