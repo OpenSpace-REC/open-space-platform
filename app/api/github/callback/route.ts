@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 import { auth } from "@/lib/auth";
-import {prisma} from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
+
 const GITHUB_CLIENT_ID = process.env.AUTH_GITHUB_ID;
 const GITHUB_CLIENT_SECRET = process.env.AUTH_GITHUB_SECRET;
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'; 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
 
- 
   const session = await auth();
-  if (!session) {
+  if (!session || !session.user || !session.user.email) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
@@ -35,7 +35,6 @@ export async function GET(request: Request) {
 
   const tokenData = await tokenResponse.json();
 
-
   const userResponse = await fetch('https://api.github.com/user', {
     headers: {
       Authorization: `token ${tokenData.access_token}`,
@@ -49,8 +48,7 @@ export async function GET(request: Request) {
 
   const userData = await userResponse.json();
 
- 
-  const email = session.user.email; 
+  const email = session.user.email;
   const updatedUser = await prisma.user.upsert({
     where: { email },
     update: {
@@ -59,8 +57,8 @@ export async function GET(request: Request) {
       githubAvatarUrl: userData.avatar_url,
     },
     create: {
-      googleId: session.googleId, 
-      name: session.user.name, 
+      googleId: session.googleId || '',
+      name: session.user.name || '',
       email,
       githubUsername: userData.login,
       githubProfileUrl: userData.html_url,
@@ -70,6 +68,5 @@ export async function GET(request: Request) {
 
   console.log('Updated or created user:', updatedUser);
 
-  
-  return NextResponse.redirect(`${BASE_URL}/landing`); 
+  return NextResponse.redirect(`${BASE_URL}/landing`);
 }
