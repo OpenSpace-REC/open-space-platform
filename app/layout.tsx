@@ -2,7 +2,7 @@ import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
-import { Toaster } from "@/components/ui/toaster"
+import LayoutContent from "@/components/ui/layout-content";
 
 // Use the font in the layout
 const poppins = Poppins({
@@ -25,10 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         <SessionProvider>
-
-          {children}
-          <Toaster />
-
+          <LayoutContent>{children}</LayoutContent>
         </SessionProvider>
       </body>
     </html>
