@@ -2,13 +2,16 @@ import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
-import LayoutContent from "@/components/ui/layout-content";
 
-// Use the font in the layout
+import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "@/components/user-context";
+import Navbar from "@/components/ui/nav-bar";
+
+
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "700"], // Specify the weights you need
-  display: "swap", // Optional, helps with font rendering
+  weight: ["400", "700"], 
+  display: "swap", 
 });
 
 export const metadata: Metadata = {
@@ -25,9 +28,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         <SessionProvider>
-          <LayoutContent>{children}</LayoutContent>
+        <UserProvider>
+         
+          {children}
+          <Toaster />
+          </UserProvider>
         </SessionProvider>
       </body>
     </html>
   );
 }
+

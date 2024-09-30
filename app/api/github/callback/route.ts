@@ -60,5 +60,5 @@ export async function GET(request: Request) {
 
   console.log('Updated or created user:', updatedUser);
 
-  return NextResponse.redirect(`${BASE_URL}/landing`);
+  return NextResponse.redirect(`${BASE_URL}/dashboard`);
 }

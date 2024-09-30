@@ -19,7 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     
   ],
   callbacks: {
-    async jwt({ token, account, profile, trigger }) {
+    async jwt({ token, account }) {
       if (account?.provider === "google") {
         (token as ExtendedToken).googleId = account.providerAccountId;
       }
@@ -32,23 +32,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       extendedSession.googleId = extendedToken.googleId;
       return extendedSession;
     },
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const protectedPaths = ['/landing', '/profile', '/settings']
-      const isProtected = protectedPaths.some(path => nextUrl.pathname.startsWith(path))
-      
-      if (isProtected) {
-        if (isLoggedIn) return true
-        return false 
-      }
-      return true
-    }
+    
   },
   pages: {
     signIn: '/auth/google-signin', 
   },
 })
 
-export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/settings/:path*']
-}

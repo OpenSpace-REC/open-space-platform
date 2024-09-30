@@ -14,14 +14,18 @@ export async function GET(req: NextRequest) {
   
   const email = session?.user?.email;
 
-  
+  if(!email){
+    return NextResponse.json({"message": "email does not exist"});
+  }
+
   const user = await prisma.user.findUnique({
     where: { email },
   });
-
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   return NextResponse.json(user);
+  
+  
 }
