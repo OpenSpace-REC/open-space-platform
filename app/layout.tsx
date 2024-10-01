@@ -5,7 +5,7 @@ import { SessionProvider } from "next-auth/react";
 
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "@/components/user-context";
-import Navbar from "@/components/ui/nav-bar";
+
 
 
 const poppins = Poppins({
@@ -25,11 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.className} antialiased`}>
+    <html lang="en" className="dark">
+      <body className={`${poppins.className} bg-background `}>
         <SessionProvider>
         <UserProvider>
-         
           {children}
           <Toaster />
           </UserProvider>

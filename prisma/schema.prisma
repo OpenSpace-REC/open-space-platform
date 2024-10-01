@@ -19,6 +19,7 @@ model User {
   id                String         @id @default(uuid())
   googleId          String         @unique
   name              String
+  bio               String?
   email             String         @unique
   githubUsername    String?
   githubProfileUrl  String?

@@ -52,7 +52,7 @@ export default function SignUpPage() {
                     description: "Link Github",
                     
                 });
-                router.push("/auth/github-link");
+                router.push("/github-link");
             }else if (response.status === 409) {
                 toast({
                     title: "User already exists",
@@ -75,7 +75,7 @@ export default function SignUpPage() {
     };
 
     return (
-        <main className="w-screen h-[100%] flex items-center justify-center">
+        <main className="w-screen h-screen flex items-center justify-center">
             <Card className="bg-zinc-950 text-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-lg border border-white border-opacity-30">
                 <CardHeader>
                     <p className="flex items-center justify-center font-semibold text-4xl">/Open-Space</p>

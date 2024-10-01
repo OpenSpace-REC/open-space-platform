@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 type User = {
   id: string;
   name: string;
+  bio: string;
   email: string;
   githubAvatarUrl?: string;
   rank?: string;

@@ -1,7 +1,10 @@
+import { Button } from "@/components/ui/button";
 
 export default function ExploreProjectsPage() {
 
     return(
-        <p>Dashboard Page</p>
+        <div>
+           Dashboard
+        </div>
     )
 }
