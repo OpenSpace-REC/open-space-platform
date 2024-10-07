@@ -34,7 +34,7 @@ export default function SignUpPage() {
     const handleConfirm = async () => {
         if (!session) return;
         try {
-            const response = await fetch("/api/auth/create-user", {
+            const response = await fetch("/api/create-user", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export default function SignUpPage() {
             } else {
                 const data = await response.json();
                 console.log("Success:", data);
-                router.push("/auth/github-link");
+                router.push("/github-link");
             }
 
 
