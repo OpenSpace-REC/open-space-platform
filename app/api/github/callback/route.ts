@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   }
 
   const tokenData = await tokenResponse.json();
-
+  console.log('Token data:', tokenData);
   const userResponse = await fetch('https://api.github.com/user', {
     headers: {
       Authorization: `token ${tokenData.access_token}`,
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
   }
 
   const userData = await userResponse.json();
-
+  
   const email = session.user.email;
   const updatedUser = await prisma.user.update({
     where: { email },
