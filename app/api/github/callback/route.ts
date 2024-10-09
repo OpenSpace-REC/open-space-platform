@@ -55,7 +55,6 @@ export async function GET(request: Request) {
       githubUsername: userData.login,
       githubProfileUrl: userData.html_url,
       githubAvatarUrl: userData.avatar_url,
-      access_token: tokenData.access_token,
     },
   });
 
@@ -63,4 +62,3 @@ export async function GET(request: Request) {
 
   return NextResponse.redirect(`${BASE_URL}/dashboard`);
 }
-
