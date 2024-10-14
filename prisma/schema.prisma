@@ -21,7 +21,7 @@ model User {
   name              String
   bio               String?
   email             String         @unique
-  githubUsername    String?
+  githubUsername    String        @unique
   githubProfileUrl  String?
   githubAvatarUrl   String?
   rank              Int            @default(0)

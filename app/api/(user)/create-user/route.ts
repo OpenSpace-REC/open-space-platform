@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
                 googleId,
                 name,
                 email,
+                githubUsername: "",
             },
         });
 
