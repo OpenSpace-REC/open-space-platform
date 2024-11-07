@@ -16,4 +16,30 @@ export interface Project {
   language: string;
   pullRequests: number;
   stars: number;
+}
+
+export interface ProjectTag {
+  id: string;
+  name: string;
+  title: string | null;
+  status: string | null;
+  conference: string | null;
+  date: string | null;
+  competition: string | null;
+  projectId: string;
+  curatorId: string;
+  createdAt: string;
+  curator: {
+    id: string;
+    googleId: string;
+    name: string;
+    bio: string;
+    email: string;
+    githubUsername: string;
+    githubProfileUrl: string;
+    githubAvatarUrl: string;
+    role: string;
+    rank: number;
+    joinDate: string;
+  };
 } 

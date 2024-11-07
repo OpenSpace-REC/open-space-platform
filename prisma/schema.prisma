@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("POSTGRES_PRISMA_URL") 
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 
@@ -28,7 +29,7 @@ model User {
   name              String
   bio               String?
   email             String         @unique
-  githubUsername    String         @unique
+  githubUsername    String?        @unique
   githubProfileUrl  String?
   githubAvatarUrl   String?
   role              UserRole       @default(INDIVIDUAL) 
@@ -43,7 +44,7 @@ model Project {
   name              String
   description       String?
   problemStatement  String?              
-  githubUrl         String               @unique
+  githubUrl         String?               @unique
   demoUrl           String?              
   techStack         String[]
   imageUrl          String?
@@ -51,18 +52,20 @@ model Project {
   projectType       String               
   keyFeatures       String[]                        
   projectImages     ProjectImage[]       
+  resources         ProjectResource[]
   users             ProjectUser[]
   pendingUsers      PendingProjectUser[]
   tags              ProjectTag[]         
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
+  votes     Vote[]
 }
 
 model ProjectTag {
   id          String           @id @default(uuid())
   name        String
-  title       String?          // Made optional
-  status      ProjectTagStatus? // Made optional
+  title       String?          
+  status      ProjectTagStatus?
   conference  String?   
   date        DateTime? 
   competition String?   
@@ -107,4 +110,36 @@ model ProjectImage {
   updatedAt   DateTime @updatedAt
 
   @@index([projectId])
+}
+
+model ProjectResource {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  url         String
+  type        String   // 'image' | 'document' | 'presentation' | 'paper' | 'other'
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  projectId String
+  userEmail String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, userEmail])
+}
+
+model VotingStatus {
+  id        String   @id @default("voting_status")
+  isOpen    Boolean  @default(false)
+  startTime DateTime?
+  endTime   DateTime?
+  updatedAt DateTime @updatedAt
 }

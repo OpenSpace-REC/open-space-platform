@@ -4,7 +4,28 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectsGrid } from '@/components/projects/projects-grid';
 import { ProjectsLoading } from '@/components/projects/projects-loading';
-import { Project } from '@/types/project';
+
+interface ProjectUser {
+  user: {
+    name: string;
+    githubAvatarUrl: string | null;
+    githubUsername: string;
+  };
+  role: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  githubUrl: string;
+  techStack: string[];
+  imageUrl: string | null;
+  users: ProjectUser[];
+  language: string;
+  pullRequests: number;
+  stars: number;
+}
 
 export default function ExploreProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -23,7 +44,17 @@ export default function ExploreProjectsPage() {
         throw new Error('Failed to fetch projects');
       }
       const data = await response.json();
-      setProjects(data);
+      
+      // Log the data to see what we're getting from the API
+      console.log('Fetched projects:', data);
+      
+      // Ensure the data includes user information
+      const projectsWithUsers = data.map((project: Project) => ({
+        ...project,
+        users: project.users || []
+      }));
+      
+      setProjects(projectsWithUsers);
     } catch (err) {
       setError('An error occurred while fetching projects');
       console.error(err);

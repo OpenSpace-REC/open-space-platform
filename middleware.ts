@@ -1,32 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  const session = await auth();
+export function middleware(request: NextRequest) {
+  // Check if it's a preview deployment
+  const isPreview = process.env.VERCEL_ENV === 'preview'
+  const response = NextResponse.next()
 
-  const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
+  // Add CORS headers
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
-  if (!session) {
-    if (isApiRoute) {
-
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    } else {
-
-      const url = request.nextUrl.clone();
-      url.pathname = '/google-signin';
-      return NextResponse.redirect(url);
-    }
+  // If it's a preview deployment and the path starts with /api/projects,
+  // bypass authentication
+  if (isPreview && request.nextUrl.pathname.startsWith('/api/projects')) {
+    return response
   }
 
-  return NextResponse.next();
+  return response
 }
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/profile/:path*',
-    '/upload-project',
-    // '/api/projects/:path*',
-    '/api/users/:path*'
-  ],
-};
+    '/api/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ]
+}

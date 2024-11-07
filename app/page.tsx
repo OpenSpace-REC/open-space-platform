@@ -9,7 +9,6 @@ export default function Home() {
         <Link href="/google-signin">
         <Button >Get Started</Button>
         </Link>
-        <Button>Learn</Button>
       </div>
     </div>
   );
