@@ -10,8 +10,82 @@ export async function GET(
 ) {
   try {
     const project = await prisma.project.findUnique({
-      where: {
-        id: params.id
+      where: { id: params.id },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+        resources: true,
+        projectImages: true,
+      },
+    });
+
+    if (!project) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(project);
+  } catch (error) {
+    console.error('Error fetching project:', error);
+    return NextResponse.json({ error: 'Failed to fetch project' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json();
+    const {
+      name,
+      description,
+      githubUrl,
+      demoUrl,
+      techStack,
+      imageUrl,
+      problemStatement,
+      status,
+      projectType,
+      keyFeatures,
+      resources,
+      users,
+    } = body;
+
+    // Update project
+    const updatedProject = await prisma.project.update({
+      where: { id: params.id },
+      data: {
+        name,
+        description,
+        githubUrl,
+        demoUrl,
+        techStack,
+        imageUrl,
+        problemStatement,
+        status,
+        projectType,
+        keyFeatures,
+        // Update resources
+        resources: {
+          deleteMany: {},
+          create: resources.map((resource: any) => ({
+            url: resource.url,
+            title: resource.title,
+            type: resource.type,
+            description: resource.description
+          }))
+        },
+        // Update users
+        users: {
+          deleteMany: {},
+          create: users.map((user: any) => ({
+            userId: user.id,
+            role: user.role,
+          }))
+        },
       },
       include: {
         users: {
@@ -19,40 +93,67 @@ export async function GET(
             user: true,
           },
         },
-        pendingUsers: true,
         resources: true,
-        tags: {
-          include: {
-            curator: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        projectImages: true,
       },
     });
 
-    console.log('API Response - Project Tags:', project?.tags); // Debug log
-
-    if (!project) {
-      return NextResponse.json(
-        { error: 'Project not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(project);
+    return NextResponse.json(updatedProject);
   } catch (error) {
-    console.error('Error fetching project:', error);
+    console.error('Error updating project:', error);
+    return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Delete all related records first
+    await prisma.$transaction(async (tx) => {
+      // Delete project resources
+      await tx.projectResource.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Delete project images
+      await tx.projectImage.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Delete project tags
+      await tx.projectTag.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Delete project users
+      await tx.projectUser.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Delete pending project users
+      await tx.pendingProjectUser.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Delete votes
+      await tx.vote.deleteMany({
+        where: { projectId: params.id }
+      });
+
+      // Finally delete the project
+      await tx.project.delete({
+        where: { id: params.id }
+      });
+    });
+
+    return NextResponse.json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to delete project' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
