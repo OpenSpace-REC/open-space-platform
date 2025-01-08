@@ -128,6 +128,7 @@ export default function UploadProjectsPage() {
     description: ''
   });
   const { toast } = useToast()
+  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
 
   const resetForm = () => {
     setProject({
@@ -175,6 +176,7 @@ export default function UploadProjectsPage() {
   const handleRepoSelect = async (repoFullName: string) => {
     const selected = repositories.find(repo => repo.full_name === repoFullName)
     if (selected) {
+      setSelectedRepo(selected);
       setProject(prev => ({
         ...prev,
         githubUrl: selected.html_url,
@@ -306,6 +308,8 @@ export default function UploadProjectsPage() {
     e.preventDefault()
     if (!validateForm() || !user) return
 
+    if (!enableGithub && !selectedRepo) return
+
     setIsSubmitting(true)
     setSubmitStatus('idle')
     setErrorMessage('')
@@ -339,8 +343,29 @@ export default function UploadProjectsPage() {
         return
       }
 
-      const data = await response.json()
-      console.log('Project created:', data)
+      const projectData = await response.json()
+      console.log('Project created:', projectData)
+
+      if (!enableGithub && selectedRepo) {
+        const webhookResponse = await fetch('/api/github/webhook/setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            reponame: selectedRepo.name,
+          }),
+        });
+
+        if (!webhookResponse.ok) {
+          throw new Error(`Failed to set up webhook! status: ${webhookResponse.status}`);
+        }
+
+        const webhookData = await webhookResponse.json();
+        console.log('Webhook setup successful:', webhookData);
+      }
+
       setSubmitStatus('success')
     } catch (error) {
       console.error('Error creating project:', error)

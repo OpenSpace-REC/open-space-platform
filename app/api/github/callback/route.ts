@@ -28,6 +28,7 @@ export async function GET(request: Request) {
         client_id: GITHUB_CLIENT_ID,
         client_secret: GITHUB_CLIENT_SECRET,
         code,
+        scope: 'admin:repo_hook'
       }),
     });
 
@@ -60,17 +61,15 @@ export async function GET(request: Request) {
           githubUsername: userData.login,
           githubProfileUrl: userData.html_url,
           githubAvatarUrl: userData.avatar_url,
+          githubAccessToken: tokenData.access_token, // Store the GitHub access token here
         },
       });
 
-      
       const pendingUsers = await tx.pendingProjectUser.findMany({
         where: { githubUsername: userData.login }
       });
 
-      
       for (const pendingUser of pendingUsers) {
-        
         await tx.projectUser.create({
           data: {
             userId: updatedUser.id,
@@ -79,7 +78,6 @@ export async function GET(request: Request) {
           }
         });
 
-        
         await tx.pendingProjectUser.delete({
           where: { id: pendingUser.id }
         });
@@ -93,7 +91,6 @@ export async function GET(request: Request) {
 
     console.log(`GitHub linked successfully. Converted ${result.convertedCount} pending project memberships.`);
 
-    
     const redirectUrl = new URL(`${BASE_URL}/dashboard`);
     redirectUrl.searchParams.set('github_linked', 'true');
     redirectUrl.searchParams.set('converted_projects', result.convertedCount.toString());

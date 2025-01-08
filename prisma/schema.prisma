@@ -3,98 +3,85 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") 
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-
-enum UserRole {
-  INDIVIDUAL
-  ADMIN
-  CURATOR
-}
-
-enum ProjectTagStatus {
-  PUBLISHED
-  IN_REVIEW
-  DRAFT
-  COMPLETED
-  ONGOING
-}
-
 model User {
-  id                String         @id @default(uuid())
-  googleId          String         @unique
-  name              String
-  bio               String?
-  email             String         @unique
-  githubUsername    String?        @unique
-  githubProfileUrl  String?
-  githubAvatarUrl   String?
-  role              UserRole       @default(INDIVIDUAL) 
-  rank              Int            @default(0)
-  joinDate          DateTime       @default(now())
-  projects          ProjectUser[]
-  projectTags       ProjectTag[]   
+  id               String        @id @default(uuid())
+  googleId         String        @unique
+  name             String
+  bio              String?
+  email            String        @unique
+  githubUsername   String?       @unique
+  githubProfileUrl String?
+  githubAvatarUrl  String?
+  githubAccessToken String?
+  role             UserRole      @default(INDIVIDUAL)
+  rank             Int           @default(0)
+  joinDate         DateTime      @default(now())
+  projectTags      ProjectTag[]
+  projects         ProjectUser[]
 }
 
 model Project {
-  id                String               @id @default(uuid())
-  name              String
-  description       String?
-  problemStatement  String?              
-  githubUrl         String?               @unique
-  demoUrl           String?              
-  techStack         String[]
-  imageUrl          String?
-  status            String               
-  projectType       String               
-  keyFeatures       String[]                        
-  projectImages     ProjectImage[]       
-  resources         ProjectResource[]
-  users             ProjectUser[]
-  pendingUsers      PendingProjectUser[]
-  tags              ProjectTag[]         
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  votes     Vote[]
+  id               String               @id @default(uuid())
+  name             String
+  description      String?
+  problemStatement String?
+  githubUrl        String?              @unique
+  demoUrl          String?
+  techStack        String[]
+  imageUrl         String?
+  status           String
+  projectType      String
+  keyFeatures      String[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  pendingUsers     PendingProjectUser[]
+  projectImages    ProjectImage[]
+  resources        ProjectResource[]
+  tags             ProjectTag[]
+  users            ProjectUser[]
+  votes            Vote[]
 }
 
 model ProjectTag {
-  id          String           @id @default(uuid())
+  id          String            @id @default(uuid())
   name        String
-  title       String?          
+  title       String?
   status      ProjectTagStatus?
-  conference  String?   
-  date        DateTime? 
-  competition String?   
-  project     Project          @relation(fields: [projectId], references: [id])
+  conference  String?
+  date        DateTime?
+  competition String?
   projectId   String
-  curator     User             @relation(fields: [curatorId], references: [id])
   curatorId   String
-  createdAt   DateTime         @default(now())
+  createdAt   DateTime          @default(now())
+  curator     User              @relation(fields: [curatorId], references: [id])
+  project     Project           @relation(fields: [projectId], references: [id])
 
   @@unique([projectId, name])
   @@index([curatorId])
 }
+
 model ProjectUser {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
+  id        String  @id @default(uuid())
   userId    String
-  project   Project  @relation(fields: [projectId], references: [id])
   projectId String
   role      String
-  
+  project   Project @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
   @@unique([userId, projectId])
 }
 
 model PendingProjectUser {
-  id              String   @id @default(uuid())
-  githubUsername  String
-  project         Project  @relation(fields: [projectId], references: [id])
-  projectId       String
-  role            String
+  id             String  @id @default(uuid())
+  githubUsername String
+  projectId      String
+  role           String
+  project        Project @relation(fields: [projectId], references: [id])
 
   @@unique([githubUsername, projectId])
 }
@@ -105,9 +92,9 @@ model ProjectImage {
   description String
   url         String
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
 }
@@ -117,11 +104,11 @@ model ProjectResource {
   title       String
   description String
   url         String
-  type        String   // 'image' | 'document' | 'presentation' | 'paper' | 'other'
+  type        String
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
 }
@@ -137,9 +124,23 @@ model Vote {
 }
 
 model VotingStatus {
-  id        String   @id @default("voting_status")
-  isOpen    Boolean  @default(false)
+  id        String    @id @default("voting_status")
+  isOpen    Boolean   @default(false)
   startTime DateTime?
   endTime   DateTime?
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime  @updatedAt
+}
+
+enum UserRole {
+  INDIVIDUAL
+  ADMIN
+  CURATOR
+}
+
+enum ProjectTagStatus {
+  PUBLISHED
+  IN_REVIEW
+  DRAFT
+  COMPLETED
+  ONGOING
 }
