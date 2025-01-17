@@ -9,20 +9,20 @@ datasource db {
 }
 
 model User {
-  id               String        @id @default(uuid())
-  googleId         String        @unique
-  name             String
-  bio              String?
-  email            String        @unique
-  githubUsername   String?       @unique
-  githubProfileUrl String?
-  githubAvatarUrl  String?
+  id                String        @id @default(uuid())
+  googleId          String        @unique
+  name              String
+  bio               String?
+  email             String        @unique
+  githubUsername    String?       @unique
+  githubProfileUrl  String?
+  githubAvatarUrl   String?
+  role              UserRole      @default(INDIVIDUAL)
+  joinDate          DateTime      @default(now())
   githubAccessToken String?
-  role             UserRole      @default(INDIVIDUAL)
-  rank             Int           @default(0)
-  joinDate         DateTime      @default(now())
-  projectTags      ProjectTag[]
-  projects         ProjectUser[]
+  points            Int           @default(0)
+  projectTags       ProjectTag[]
+  projects          ProjectUser[]
 }
 
 model Project {
