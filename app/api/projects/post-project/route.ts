@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
+async function getNextProjectId() {
+  const year = new Date().getFullYear();
+  const counter = await prisma.counter.upsert({
+    where: { id: 'project_counter' },
+    update: { count: { increment: 1 } },
+    create: { id: 'project_counter', count: 1 },
+  });
+  return `${year}-${String(counter.count).padStart(4, '0')}`;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -21,7 +31,6 @@ export async function POST(req: Request) {
       ownerId,
     } = body;
 
-    // Separate existing users and pending users
     const userPromises = users.map(async (user: { githubUsername: string; role: string }) => {
       const existingUser = await prisma.user.findUnique({
         where: { githubUsername: user.githubUsername }
@@ -36,9 +45,11 @@ export async function POST(req: Request) {
     const existingUsers = userResults.filter(user => user.exists);
     const pendingUsers = userResults.filter(user => !user.exists);
 
-    // Create project with resources and handle both existing and pending users
+    const projectId = await getNextProjectId();
+
     const project = await prisma.project.create({
       data: {
+        id: projectId,
         name,
         description,
         ...(githubUrl ? { githubUrl } : {}),
@@ -51,10 +62,10 @@ export async function POST(req: Request) {
         keyFeatures,
         resources: {
           create: resources.map((resource: {
-            url: string
-            title: string
-            type: string
-            description: string
+            url: string;
+            title: string;
+            type: string;
+            description: string;
           }) => ({
             url: resource.url,
             title: resource.title,
@@ -62,7 +73,6 @@ export async function POST(req: Request) {
             description: resource.description
           }))
         },
-        // Create ProjectUser records for existing users
         users: {
           create: existingUsers.map((user) => ({
             role: user.role,
@@ -73,7 +83,6 @@ export async function POST(req: Request) {
             },
           })),
         },
-        // Create PendingProjectUser records for non-existing users
         pendingUsers: {
           create: pendingUsers.map((user) => ({
             githubUsername: user.githubUsername,
@@ -97,14 +106,12 @@ export async function POST(req: Request) {
     console.error('Error creating project:', error);
     
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      // P2002 is the error code for unique constraint violations
       if (error.code === 'P2002') {
         return NextResponse.json(
           { error: 'A project with this GitHub URL already exists' },
           { status: 409 }
         );
       }
-      // P2025 is the error code for records not found
       if (error.code === 'P2025') {
         return NextResponse.json(
           { error: 'One or more users could not be found' },

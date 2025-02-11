@@ -19,6 +19,7 @@ export async function GET(
         },
         resources: true,
         projectImages: true,
+        tags : true,
       },
     });
 
@@ -54,7 +55,22 @@ export async function PATCH(
       users,
     } = body;
 
-    // Update project
+    // First, fetch all users by their GitHub usernames to get their actual IDs
+    const userGithubUsernames = users.map((user: any) => user.githubUsername);
+    const dbUsers = await prisma.user.findMany({
+      where: {
+        githubUsername: {
+          in: userGithubUsernames
+        }
+      }
+    });
+
+    // Create a mapping of GitHub usernames to user IDs
+    const usernameToIdMap = new Map(
+      dbUsers.map(user => [user.githubUsername, user.id])
+    );
+
+    // Update project with proper user IDs
     const updatedProject = await prisma.project.update({
       where: { id: params.id },
       data: {
@@ -68,7 +84,6 @@ export async function PATCH(
         status,
         projectType,
         keyFeatures,
-        // Update resources
         resources: {
           deleteMany: {},
           create: resources.map((resource: any) => ({
@@ -78,13 +93,14 @@ export async function PATCH(
             description: resource.description
           }))
         },
-        // Update users
         users: {
           deleteMany: {},
-          create: users.map((user: any) => ({
-            userId: user.id,
-            role: user.role,
-          }))
+          create: users
+            .filter((user: any) => usernameToIdMap.has(user.githubUsername))
+            .map((user: any) => ({
+              userId: usernameToIdMap.get(user.githubUsername),
+              role: user.role,
+            }))
         },
       },
       include: {
@@ -100,10 +116,12 @@ export async function PATCH(
     return NextResponse.json(updatedProject);
   } catch (error) {
     console.error('Error updating project:', error);
-    return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update project' }, 
+      { status: 500 }
+    );
   }
 }
-
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }

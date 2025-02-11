@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from 'next/image'
+import TechStackSelector from '@/components/ui/dymanic-techstack'
 
 interface ProjectUser {
   id: string
@@ -107,6 +108,7 @@ export default function UploadProjectsPage() {
     resources: [] as ProjectResource[],
     projectImages: [] as ProjectImage[],
   })
+  const [techStack, setTechStack] = useState<string>("");
   const [projectUsers, setProjectUsers] = useState<ProjectUser[]>([])
   const [newProjectUser, setNewProjectUser] = useState({ githubUsername: '', role: 'CONTRIBUTOR' as const })
   const [errors, setErrors] = useState<Partial<typeof project & { projectUsers: string }>>({})
@@ -710,7 +712,7 @@ export default function UploadProjectsPage() {
                       )
                     ))}
                   </div>
-                  <Select
+                  {/* <Select
                     onValueChange={(value) => {
                       addTechStack(value);
                     }}
@@ -725,7 +727,9 @@ export default function UploadProjectsPage() {
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                  </Select> */}
+                <TechStackSelector project={{ techStack }} addTechStack={addTechStack} removeTech={removeTech} />
+
                 </div>
               </CardContent>
             </Card>
@@ -738,7 +742,7 @@ export default function UploadProjectsPage() {
                 <CardDescription>List the main features of your project</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
+                <ScrollArea className="max-h-[400px] pr-4">
                   <div className="space-y-4">
                     {project.keyFeatures.map((feature, index) => (
                       <div key={index} className="flex gap-2">

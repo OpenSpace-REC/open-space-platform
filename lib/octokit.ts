@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { Octokit } from '@octokit/rest'
+import { decryptToken } from './encryption'
 
 const prisma = new PrismaClient()
 
@@ -42,7 +43,7 @@ export async function getGithubToken(userid: string): Promise<TokenResult> {
     }
 
     return {
-      token: user.githubAccessToken,
+      token: decryptToken(user.githubAccessToken),
       user: {
         name: user.name,
         githubUsername: user.githubUsername

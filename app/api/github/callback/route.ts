@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma"
+import { encryptToken } from "@/lib/encryption";
 
 const GITHUB_CLIENT_ID = process.env.AUTH_GITHUB_ID;
 const GITHUB_CLIENT_SECRET = process.env.AUTH_GITHUB_SECRET;
@@ -61,7 +62,7 @@ export async function GET(request: Request) {
           githubUsername: userData.login,
           githubProfileUrl: userData.html_url,
           githubAvatarUrl: userData.avatar_url,
-          githubAccessToken: tokenData.access_token, // Store the GitHub access token here
+          githubAccessToken: encryptToken(tokenData.access_token), 
         },
       });
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit3, Mail, Github, Calendar } from "lucide-react";
+import { Edit3, Mail, Github, Calendar, X } from "lucide-react";
 import { useUser } from '@/components/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -47,6 +47,8 @@ interface EditableProfileData {
   bio: string | null;
 }
 
+type StatusType = 'DRAFT' | 'IN_PROGRESS' | 'COMPLETED';
+
 interface ProjectWithRole {
   role: string;
   project: {
@@ -66,9 +68,9 @@ interface ValidationErrors {
 
 interface TagFormData {
   name: string;
-  projectId: string;
+  projectId: string | string[];
   title: string;
-  status: typeof statusOptions[number];
+  status: StatusType | '';
   conference: string;
   date: string;
   competition: string;
@@ -78,7 +80,7 @@ interface TagFormData {
 
 const statusOptions = [
   'PUBLISHED',
-  'IN_REVIEW', 
+  'IN_REVIEW',
   'DRAFT',
   'COMPLETED',
   'ONGOING'
@@ -86,13 +88,16 @@ const statusOptions = [
 
 export default function DashboardPage() {
   const { user, updateUser } = useUser();
+  const statusOptions: StatusType[] = ['DRAFT', 'IN_PROGRESS', 'COMPLETED'];
+  const [projectIds, setProjectIds] = useState<string[]>([]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [tagFormData, setTagFormData] = useState<TagFormData>({
     name: '',
     projectId: '',
     title: '',
-    status: 'PUBLISHED',
+    status: '',
     conference: '',
     date: '',
     competition: ''
@@ -102,7 +107,17 @@ export default function DashboardPage() {
     bio: null
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [visitCount, setVisitCount] = useState(0);
 
+  useEffect(() => {
+    const visits = localStorage.getItem("visitCount");
+    const visitNumber = visits ? parseInt(visits, 10) : 0;
+
+    if (visitNumber < 10) {
+      setVisitCount(visitNumber + 1);
+      localStorage.setItem("visitCount", (visitNumber + 1).toString());
+    }
+  }, []);
   useEffect(() => {
     if (user) {
       setEditableData({
@@ -168,6 +183,26 @@ export default function DashboardPage() {
     setIsEditing(open);
   };
 
+
+  const handleProjectIdInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTagFormData(prev => ({ ...prev, projectId: value }));
+    
+    if (value.endsWith(',')) {
+      const newId = value.slice(0, -1).trim();
+      if (newId && !projectIds.includes(newId)) {
+        setProjectIds(prev => [...prev, newId]);
+        setTagFormData(prev => ({ ...prev, projectId: '' }));
+      }
+    }
+  };
+
+  const removeProjectId = (idToRemove: string) => {
+    setProjectIds(prev => prev.filter(id => id !== idToRemove));
+  };
+
+
+
   const handleCreateTag = async () => {
     try {
       if (tagFormData.date && !isValidDate(tagFormData.date)) {
@@ -202,7 +237,7 @@ export default function DashboardPage() {
         name: '',
         projectId: '',
         title: '',
-        status: 'PUBLISHED',
+        status: '',
         conference: '',
         date: '',
         competition: ''
@@ -244,13 +279,54 @@ export default function DashboardPage() {
       stars: 0
     }));
 
+  const contributedProjects: Project[] = (user.projects || [])
+    .filter((p: ProjectWithRole) => p.role === 'CONTRIBUTOR')
+    .map((p: ProjectWithRole) => ({
+      id: p.project.id,
+      name: p.project.name,
+      description: p.project.description,
+      githubUrl: p.project.githubUrl,
+      techStack: p.project.techStack,
+      imageUrl: p.project.imageUrl,
+      users: [{
+        user: {
+          name: user.name,
+          githubAvatarUrl: user.githubAvatarUrl || null,
+          githubUsername: user.githubUsername || ''
+        },
+        role: 'CONTRIBUTOR'
+      }],
+      language: p.project.techStack[0] || 'N/A',
+      pullRequests: 0,
+      stars: 0
+    }));
+
   const hasTaggingPermissions = (role?: string) => {
     return role === 'CURATOR' || role === 'ADMIN';
   };
 
+
   return (
     <div className="container mx-auto text-foreground min-h-screen p-4 bg-background">
-      <Card className="w-full mb-6 bg-card">
+      {visitCount > 0 && visitCount <= 20 && (
+        <Card className="w-full mb-6 bg-transparent border border-gray-700">
+          <CardHeader>
+            <div className="">
+              <h2 className="text-2xl font-bold text-white">Welcome to Open-Space</h2>
+              <p className="text-sm text-gray-300 mt-2">
+                Explore the features we've introduced! Check out the feature showcase to learn more.
+              </p>
+              <Button
+                className="mt-4 text-black bg-white"
+                onClick={() => window.location.href = "/get-started"}
+              >
+                Go to Feature Showcase
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+      <Card className=" w-full mb-6 bg-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Avatar className="w-24 h-24">
@@ -360,142 +436,162 @@ export default function DashboardPage() {
       </Card>
 
       {hasTaggingPermissions(user.role) && (
-        <Card className="w-full mb-6 bg-card">
+        <Card className='mb-6'>
           <CardHeader>
-            <h2 className="text-lg font-semibold">Curator Tools</h2>
-            <p className="text-sm text-muted-foreground">
-              Manage academic highlights and project tags
-            </p>
-          </CardHeader>
-          <CardContent>
-            <Dialog open={isCreatingTag} onOpenChange={setIsCreatingTag}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Create Academic Tag
+          <h2 className="text-lg font-semibold">Curator Tools</h2>
+        </CardHeader>
+        <CardContent className=" ">
+          <Dialog open={isCreatingTag} onOpenChange={setIsCreatingTag}>
+            <DialogTrigger asChild>
+              <Button className="w-full sm:w-auto">
+                <Edit3 className="h-4 w-4 mr-2" />
+                Create Academic Tag
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl p-6">
+              <DialogHeader className="mb-6">
+                <DialogTitle>Create Academic Highlight Tag</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-sm font-semibold mb-6">Required Information</h3>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="name" className="text-sm font-medium mb-2 block">Tag Name *</Label>
+                        <Input
+                          id="name"
+                          value={tagFormData.name}
+                          onChange={(e) => setTagFormData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="e.g., Best Paper Award"
+                          className="w-full"
+                        />
+                      </div>
+      
+                      <div>
+                        <Label htmlFor="title" className="text-sm font-medium mb-2 block">Title *</Label>
+                        <Input
+                          id="title"
+                          value={tagFormData.title}
+                          onChange={(e) => setTagFormData(prev => ({ ...prev, title: e.target.value }))}
+                          placeholder="Enter highlight title"
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+      
+                    <div>
+                      <Label htmlFor="projectId" className="text-sm font-medium mb-2 block">
+                        Project ID(s) *
+                      </Label>
+                      <Input
+                        id="projectId"
+                        value={tagFormData.projectId}
+                        onChange={handleProjectIdInput}
+                        placeholder="Type project ID and press comma to add"
+                        className="w-full"
+                      />
+                      {projectIds.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {projectIds.map((id) => (
+                            <div 
+                              key={id}
+                              className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-md"
+                            >
+                              <span className="text-sm">{id}</span>
+                              <button
+                                onClick={() => removeProjectId(id)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+      
+                    <div>
+                      <Label htmlFor="status" className="text-sm font-medium mb-2 block">Status *</Label>
+                      <Select
+                        value={tagFormData.status}
+                        onValueChange={(value: StatusType) => 
+                          setTagFormData(prev => ({ ...prev, status: value }))
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status.replace('_', ' ')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+      
+                <div>
+                  <h3 className="text-sm font-semibold mb-6">Additional Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <Label htmlFor="conference" className="text-sm font-medium mb-2 block">Conference</Label>
+                      <Input
+                        id="conference"
+                        value={tagFormData.conference}
+                        onChange={(e) => setTagFormData(prev => ({ ...prev, conference: e.target.value }))}
+                        placeholder="e.g., ICSE 2024"
+                        className="w-full"
+                      />
+                    </div>
+      
+                    <div>
+                      <Label htmlFor="date" className="text-sm font-medium mb-2 block">Date</Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        value={tagFormData.date}
+                        onChange={(e) => setTagFormData(prev => ({ ...prev, date: e.target.value }))}
+                        className="w-full"
+                      />
+                    </div>
+      
+                    <div>
+                      <Label htmlFor="competition" className="text-sm font-medium mb-2 block">Competition</Label>
+                      <Input
+                        id="competition"
+                        value={tagFormData.competition}
+                        onChange={(e) => setTagFormData(prev => ({ ...prev, competition: e.target.value }))}
+                        placeholder="e.g., Student Research Competition"
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
+              <div className="flex justify-end gap-3 mt-8">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreatingTag(false)}
+                >
+                  Cancel
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Create Academic Highlight Tag</DialogTitle>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-                  {/* Left Column - Required Fields */}
-                  <div className="space-y-4">
-                    <div className="mb-4">
-                      <h3 className="text-sm font-semibold mb-3">Required Information</h3>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="name" className="text-sm font-medium">Tag Name *</Label>
-                          <Input
-                            id="name"
-                            value={tagFormData.name}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder="e.g., Best Paper Award"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="projectId" className="text-sm font-medium">Project ID *</Label>
-                          <Input
-                            id="projectId"
-                            value={tagFormData.projectId}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, projectId: e.target.value }))}
-                            placeholder="Enter the project ID"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
-                          <Input
-                            id="title"
-                            value={tagFormData.title}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, title: e.target.value }))}
-                            placeholder="Enter highlight title"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="status" className="text-sm font-medium">Status *</Label>
-                          <Select
-                            value={tagFormData.status}
-                            onValueChange={(value: typeof statusOptions[number]) => 
-                              setTagFormData(prev => ({ ...prev, status: value }))
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {statusOptions.map((status) => (
-                                <SelectItem key={status} value={status}>
-                                  {status.replace('_', ' ')}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Column - Optional Fields */}
-                  <div className="space-y-4">
-                    <div className="mb-4">
-                      <h3 className="text-sm font-semibold mb-3">Additional Details</h3>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="conference" className="text-sm font-medium">Conference</Label>
-                          <Input
-                            id="conference"
-                            value={tagFormData.conference}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, conference: e.target.value }))}
-                            placeholder="e.g., ICSE 2024"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="date" className="text-sm font-medium">Date</Label>
-                          <Input
-                            id="date"
-                            type="date"
-                            value={tagFormData.date}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, date: e.target.value }))}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="competition" className="text-sm font-medium">Competition</Label>
-                          <Input
-                            id="competition"
-                            value={tagFormData.competition}
-                            onChange={(e) => setTagFormData(prev => ({ ...prev, competition: e.target.value }))}
-                            placeholder="e.g., Student Research Competition"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-3 mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreatingTag(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateTag}
-                    className="px-8"
-                  >
-                    Create Tag
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
+                <Button
+                  onClick={handleCreateTag}
+                  className="px-8"
+                >
+                  Create Tag
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
       )}
 
       <Card className="w-full mb-6 bg-card">
@@ -593,9 +689,26 @@ export default function DashboardPage() {
               )}
             </TabsContent>
             <TabsContent value="contributed" className="mt-6">
-              <div className="text-center py-8 text-muted-foreground">
-                No contributed projects yet.
-              </div>
+              {contributedProjects.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No projects found. Start by creating a new project!
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {contributedProjects.map((project) => (
+                    <div key={project.id} className="w-full">
+                      <ProjectCard
+                        project={project}
+                        onClick={() => {
+                          if (project.id) {
+                            window.location.href = `/project/${project.id}`;
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
