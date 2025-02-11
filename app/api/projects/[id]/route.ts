@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ProjectMember, Resource } from '@/app/types/project';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -56,7 +57,7 @@ export async function PATCH(
     } = body;
 
     // First, fetch all users by their GitHub usernames to get their actual IDs
-    const userGithubUsernames = users.map((user: any) => user.githubUsername);
+    const userGithubUsernames = users.map((user: { githubUsername: string; role: string }) => user.githubUsername);
     const dbUsers = await prisma.user.findMany({
       where: {
         githubUsername: {
@@ -86,7 +87,7 @@ export async function PATCH(
         keyFeatures,
         resources: {
           deleteMany: {},
-          create: resources.map((resource: any) => ({
+          create: resources.map((resource: Resource) => ({
             url: resource.url,
             title: resource.title,
             type: resource.type,
@@ -96,8 +97,8 @@ export async function PATCH(
         users: {
           deleteMany: {},
           create: users
-            .filter((user: any) => usernameToIdMap.has(user.githubUsername))
-            .map((user: any) => ({
+            .filter((user: { githubUsername: string; role: string }) => usernameToIdMap.has(user.githubUsername))
+            .map((user: { githubUsername: string; role: string }) => ({
               userId: usernameToIdMap.get(user.githubUsername),
               role: user.role,
             }))

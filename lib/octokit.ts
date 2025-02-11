@@ -8,8 +8,8 @@ interface TokenResult {
   token: string | null
   error?: string
   user?: {
-    name: string
-    githubUsername: string
+    name: string | null
+    githubUsername: string | null
   }
 }
 
@@ -59,23 +59,23 @@ export async function getGithubToken(userid: string): Promise<TokenResult> {
 }
 
 export async function createOctokitForUser(userId: string): Promise<{
-    octokit: Octokit | null
-    error?: string
-    user?: {
-      name: string
-      githubUsername: string
-    }
-  }> {
-    const { token, error, user } = await getGithubToken(userId)
-    
-    if (error || !token) {
-      return { octokit: null, error, user }
-    }
-  
-    const octokit = new Octokit({
-      auth: token
-    })
-  
-    return { octokit, user }
+  octokit: Octokit | null
+  error?: string
+  user?: {
+    name: string | null
+    githubUsername: string | null
   }
+}> {
+  const { token, error, user } = await getGithubToken(userId)
+  
+  if (error || !token) {
+    return { octokit: null, error, user }
+  }
+
+  const octokit = new Octokit({
+    auth: token
+  })
+
+  return { octokit, user }
+}
   

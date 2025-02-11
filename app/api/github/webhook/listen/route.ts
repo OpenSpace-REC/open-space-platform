@@ -2,6 +2,36 @@ import { headers } from 'next/headers';
 import crypto from 'crypto';
 import {prisma }from '@/lib/prisma'; // Adjust this import based on your prisma client location
 
+// Add interfaces for GitHub webhook payloads
+interface GitHubUser {
+  login: string;
+}
+
+interface PullRequest {
+  user: GitHubUser;
+  merged: boolean;
+}
+
+interface Repository {
+  full_name: string;
+}
+
+interface PullRequestPayload {
+  action: string;
+  pull_request: PullRequest;
+  repository: Repository;
+}
+
+interface Review {
+  user: GitHubUser;
+}
+
+interface PullRequestReviewPayload {
+  action: string;
+  review: Review;
+  pull_request: PullRequest;
+}
+
 // Point values for different actions
 const POINTS_CONFIG = {
   PULL_REQUEST_OPENED: 5,
@@ -11,7 +41,7 @@ const POINTS_CONFIG = {
 
 async function updateUserPoints(githubUsername: string, points: number) {
   try {
-    // Find user by GitHub username
+    
     const user = await prisma.user.findUnique({
       where: { githubUsername },
     });
@@ -38,7 +68,7 @@ async function updateUserPoints(githubUsername: string, points: number) {
   }
 }
 
-async function handlePullRequestEvent(payload: any) {
+async function handlePullRequestEvent(payload: PullRequestPayload) {
   const { action, pull_request, repository } = payload;
   const githubUsername = pull_request.user.login;
 
@@ -53,7 +83,7 @@ async function handlePullRequestEvent(payload: any) {
   }
 }
 
-async function handlePullRequestReviewEvent(payload: any) {
+async function handlePullRequestReviewEvent(payload: PullRequestReviewPayload) {
   const { action, review, pull_request } = payload;
   const githubUsername = review.user.login;
 

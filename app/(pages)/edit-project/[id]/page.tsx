@@ -131,6 +131,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
     description: ''
   });
   const { toast } = useToast()
+  const [projectOwner, setProjectOwner] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -157,12 +158,15 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
         });
 
         setProjectUsers(
-          projectData.users.map((user: any) => ({
+          projectData.users.map((user: { user: { id: string; githubUsername: string }; role: 'OWNER' | 'CONTRIBUTOR' }) => ({
             id: user.user.id,
             githubUsername: user.user.githubUsername,
             role: user.role,
           }))
         );
+
+        const ownerUser = projectData.users.find((user: { role: string }) => user.role === 'OWNER');
+        setProjectOwner(ownerUser?.user?.githubUsername || null);
 
         setIsLoading(false);
       } catch (error) {
@@ -178,7 +182,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
     if (params.id) {
       fetchProjectData();
     }
-  }, [params.id]);
+  }, [params.id, toast]);
 
   const resetForm = () => {
     setProject({
@@ -231,7 +235,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
       name: string;
       description: string;
       demoUrl: string;
-      techStack: string;
+      techStack: string[];
       imageUrl: string;
       problemStatement: string;
       status: string;
@@ -470,6 +474,10 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
     }
   };
 
+  const isOwner = Boolean(user?.githubUsername && projectUsers.some(projectUser => 
+    projectUser.githubUsername === user.githubUsername && projectUser.role === 'OWNER'
+  ));
+
   if (isLoading) {
     return <div className="container mx-auto py-8">Loading...</div>;
   }
@@ -491,6 +499,19 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
         </Card>
       </div>
     )
+  }
+
+  if (!isOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <Card className="w-96 text-center">
+          <CardHeader>
+            <CardTitle>Permission Denied</CardTitle>
+            <CardDescription>You do not have permission to edit this project.</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
   }
 
   return (

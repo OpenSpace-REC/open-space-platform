@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createOctokitForUser } from '@/lib/octokit';
 
+// Add type for GitHub API error response
+interface GitHubErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+      [key: string]: unknown;
+    };
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const { userId, reponame } = await request.json();
@@ -66,15 +76,16 @@ export async function POST(request: Request) {
       return NextResponse.json(webhookResponse.data);
     } catch (webhookError) {
       if (webhookError instanceof Error) {
+        const gitHubError = webhookError as Error & GitHubErrorResponse;
         console.error('GitHub API webhook creation error:', {
-          message: webhookError.message,
-          ...(webhookError as any).response?.data && { data: (webhookError as any).response.data },
+          message: gitHubError.message,
+          ...(gitHubError.response?.data && { data: gitHubError.response.data }),
         });
 
         return NextResponse.json(
           {
             error: 'GitHub API webhook creation error',
-            details: webhookError.message,
+            details: gitHubError.message,
           },
           { status: 500 }
         );

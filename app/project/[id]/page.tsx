@@ -21,18 +21,12 @@ import {
   Clock
 } from 'lucide-react';
 import Image from 'next/image'
+import type { Project, Resource } from '@/app/types/project';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-interface Resource {
-  id: string;
-  title: string;
-  description: string;
-  url: string;
-  type: string;
-}
-
-async function getProjectData(id: string) {
+async function getProjectData(id: string): Promise<Project> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   if (!baseUrl) throw new Error('API base URL is not configured');
 
@@ -64,7 +58,7 @@ function getProjectTypeBadge(type: string): "default" | "secondary" | "outline" 
 
 async function ProjectPage({ params }: { params: { id: string } }) {
   try {
-    const project = await getProjectData(params.id);
+    const project: Project = await getProjectData(params.id);
 
     console.log('Project Data:', {
       users: project.users,
