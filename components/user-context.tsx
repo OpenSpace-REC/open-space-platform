@@ -54,6 +54,7 @@ export interface UserContextType {
   } | null;
   updateUser: (user: User) => void;
   setUser: Dispatch<SetStateAction<User>>;
+  isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -61,6 +62,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
@@ -68,6 +70,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.email) {
+      setIsLoading(true);
       fetch('/api/user')
         .then((res) => res.json())
         .then((data) => {
@@ -75,12 +78,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
             setUser(data);
           }
         })
-        .catch((error) => console.error('Error fetching user data:', error));
+        .catch((error) => console.error('Error fetching user data:', error))
+        .finally(() => setIsLoading(false));
+    } else if (status === 'unauthenticated') {
+      setIsLoading(false);
     }
   }, [session, status]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, updateUser }}>
+    <UserContext.Provider value={{ user, setUser, updateUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );

@@ -21,11 +21,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 export default function Navbar() {
@@ -64,9 +65,10 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 w-full py-4 px-4 bg-neutral-900 bg-opacity-30 backdrop-blur-lg z-50">
       <div className="w-full flex justify-between items-center h-auto max-w-7xl mx-auto">
-        <Link href="/" className="text-3xl font-bold text-primary" aria-label="Home">
-          /Open-Space
-          {routeName && <span className="text-stone-500">{routeName}</span>}
+        <Link href="/dashboard" className="text-3xl font-bold text-primary truncate md:text-clip" aria-label="Home">
+          <span className="hidden sm:inline">/Open-Space</span>
+          <span className="sm:hidden">/OS</span>
+          {routeName && <span className="text-stone-500 hidden sm:inline">{routeName}</span>}
         </Link>
         
         {session ? (
@@ -81,7 +83,7 @@ export default function Navbar() {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className="h-8 w-8 cursor-pointer">
+                  <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
                     <AvatarImage
                       src={user?.githubAvatarUrl}
                       alt="User avatar"
@@ -92,8 +94,23 @@ export default function Navbar() {
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center gap-2 p-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={user?.githubAvatarUrl}
+                        alt="User avatar"
+                        className="h-full w-full object-cover rounded-full"
+                      />
+                      <AvatarFallback className="rounded-full">
+                        {user?.name ? getUserInitials(user.name) : "NN"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium leading-none">{user?.name}</span>
+                      <span className="text-xs text-muted-foreground mt-1 leading-none">{user?.email}</span>
+                    </div>
+                  </div>
                   <DropdownMenuSeparator />
                   <Link href="/profile">
                     <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -109,35 +126,69 @@ export default function Navbar() {
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" className="relative -mr-2">
+                    <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent>
-                  <div className="flex flex-col space-y-4 mt-4">
-                    <Link href="/dashboard" className="w-full">
-                      <Button variant="ghost" className="w-full justify-start">
-                        Dashboard
+                <SheetContent side="right" className="w-[80%] sm:w-[350px] p-0">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center justify-between p-4 border-b border-border">
+                      <span className="text-lg font-semibold">/Open-Space</span>
+                      <SheetClose asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </SheetClose>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto">
+                      <div className="flex flex-col p-4 space-y-6">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={user?.githubAvatarUrl}
+                              alt="User avatar"
+                              className="h-full w-full object-cover rounded-full"
+                            />
+                            <AvatarFallback className="rounded-full">
+                              {user?.name ? getUserInitials(user.name) : "NN"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-base font-medium leading-none truncate">{user?.name}</span>
+                            <span className="text-sm text-muted-foreground mt-1 truncate">{user?.email}</span>
+                          </div>
+                        </div>
+
+                        <nav className="space-y-2">
+                          <Link href="/dashboard" className="w-full">
+                            <Button variant="ghost" className="w-full justify-start text-base">
+                              Dashboard
+                            </Button>
+                          </Link>
+                          <Link href="/explore-projects" className="w-full">
+                            <Button variant="ghost" className="w-full justify-start text-base">
+                              Explore Projects
+                            </Button>
+                          </Link>
+                        </nav>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-border p-4 space-y-2">
+                      <Link href="/profile" className="w-full">
+                        <Button variant="ghost" className="w-full justify-start text-base">
+                          Profile
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-base text-red-500 hover:text-red-500 hover:bg-red-50/10"
+                        onClick={() => signOut()}
+                      >
+                        Logout
                       </Button>
-                    </Link>
-                    <Link href="/explore-projects" className="w-full">
-                      <Button variant="ghost" className="w-full justify-start">
-                        Explore Projects
-                      </Button>
-                    </Link>
-                    <div className="my-2 border-t border-border" />
-                    <Link href="/profile" className="w-full">
-                      <Button variant="ghost" className="w-full justify-start">
-                        Profile
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => signOut()}
-                    >
-                      Logout
-                    </Button>
+                    </div>
                   </div>
                 </SheetContent>
               </Sheet>

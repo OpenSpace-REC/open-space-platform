@@ -162,32 +162,43 @@ export default function SignUpPage() {
     };
 
     return (
-        <main className="w-screen h-screen flex items-center justify-center">
-            <Card className="bg-zinc-950 text-white w-[90%] max-w-[400px] p-6 rounded-lg shadow-lg border border-white border-opacity-30">
-                <CardHeader>
-                    <p className="flex items-center justify-center font-semibold text-4xl">/Open-Space</p>
-                    <p className="text-center text-sm text-gray-400">Early Access Beta</p>
+        <main className="w-screen h-screen flex items-center justify-center p-4">
+            <Card className="bg-zinc-950 text-white w-[90%] max-w-[400px] p-4 sm:p-6 rounded-lg shadow-lg border border-white border-opacity-30">
+                <CardHeader className="space-y-2">
+                    <p className="flex items-center justify-center font-semibold text-2xl sm:text-4xl">/Open-Space</p>
+                    <p className="text-center text-xs sm:text-sm text-gray-400">Early Access Beta</p>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4">
+                <CardContent className="flex flex-col gap-3 sm:gap-4 mt-2">
                     {!session && (
                         <SignIn buttonText="Sign in with Google" providerName="google">
-                            <FaGoogle />
+                            <FaGoogle className="text-sm sm:text-base" />
                         </SignIn>
                     )}
 
                     {session && isAllowed && (
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 sm:gap-4">
                             <div>
                                 <Input
                                     id="name"
                                     value={name}
                                     onChange={handleNameChange}
+                                    className="text-sm sm:text-base"
                                 />
                             </div>
                             <div>
-                                <Input id="email" value={userEmail} readOnly />
+                                <Input 
+                                    id="email" 
+                                    value={userEmail} 
+                                    readOnly 
+                                    className="text-sm sm:text-base"
+                                />
                             </div>
-                            <Button onClick={handleConfirm} className="bg-white text-black">Confirm</Button>
+                            <Button 
+                                onClick={handleConfirm} 
+                                className="bg-white text-black text-sm sm:text-base py-2 sm:py-3"
+                            >
+                                Confirm
+                            </Button>
                             <SignOut />
                         </div>
                     )}

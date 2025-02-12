@@ -8,14 +8,19 @@ import { ProjectsLoading } from '@/components/projects/projects-loading';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  ArrowRight, 
-  Search, 
+import {
+  Search,
   Filter,
   Star,
-  GitPullRequest,
-  Code
+  Code,
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProjectUser {
   user: {
@@ -45,12 +50,12 @@ interface FilterOptions {
   searchQuery: string;
 }
 
-export default function ExploreProjectsPage() {
+export default function AllProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
-    language: '',
+    language: 'all',
     minStars: 0,
     searchQuery: '',
   });
@@ -84,7 +89,7 @@ export default function ExploreProjectsPage() {
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
-      const matchesLanguage = !filters.language || project.language === filters.language;
+      const matchesLanguage = filters.language === 'all' || project.language === filters.language;
       const matchesStars = project.stars >= filters.minStars;
       const matchesSearch = !filters.searchQuery || 
         project.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
@@ -96,18 +101,6 @@ export default function ExploreProjectsPage() {
 
   const handleProjectClick = (projectId: string) => {
     router.push(`/project/${projectId}`);
-  };
-
-  const getFeaturedProjects = () => {
-    return projects
-      .sort((a, b) => b.stars - a.stars)
-      .slice(0, 3);
-  };
-
-  const getRecentProjects = () => {
-    return projects
-      .sort((a, b) => b.pullRequests - a.pullRequests)
-      .slice(0, 3);
   };
 
   if (loading) {
@@ -128,55 +121,71 @@ export default function ExploreProjectsPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-8">
- 
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Explore Projects</h1>
-        
+        <h1 className="text-3xl font-bold">All Projects</h1>
       </div>
 
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold flex items-center">
-            <GitPullRequest className="mr-2" /> Recent Activity
-          </h2>
-          <Button variant="ghost" onClick={() => router.push('/projects/activity')}>
-            View All <ArrowRight className="ml-2" size={16} />
-          </Button>
+      {/* Filters Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search projects..."
+            className="pl-9"
+            value={filters.searchQuery}
+            onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
+          />
         </div>
-        <ProjectsGrid
-          projects={getRecentProjects()}
-          onProjectClick={handleProjectClick}
-        />
-      </section>
+        <Select
+          value={filters.language}
+          onValueChange={(value) => setFilters({ ...filters, language: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Languages</SelectItem>
+            {uniqueLanguages.map((language) => (
+              <SelectItem key={language} value={language}>
+                {language}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={filters.minStars.toString()}
+          onValueChange={(value) => setFilters({ ...filters, minStars: parseInt(value) })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Minimum Stars" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">All Stars</SelectItem>
+            <SelectItem value="10">10+ Stars</SelectItem>
+            <SelectItem value="50">50+ Stars</SelectItem>
+            <SelectItem value="100">100+ Stars</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold flex items-center">
-            <Code className="mr-2" /> All Projects
-          </h2>
-          <Button variant="ghost" onClick={() => router.push('/explore-projects/all')}>
-            View All <ArrowRight className="ml-2" size={16} />
-          </Button>
-        </div>
-        <ProjectsGrid
-          projects={filteredProjects.slice(0, 6)}
-          onProjectClick={handleProjectClick}
-        />
-      </section>
+      {/* Projects Grid */}
+      <ProjectsGrid
+        projects={filteredProjects}
+        onProjectClick={handleProjectClick}
+      />
 
       {/* Projects Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold">{projects.length}</div>
-            <div className="text-muted-foreground">Total Projects</div>
+            <div className="text-2xl font-bold">{filteredProjects.length}</div>
+            <div className="text-muted-foreground">Filtered Projects</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">
-              {projects.reduce((sum, project) => sum + project.stars, 0)}
+              {filteredProjects.reduce((sum, project) => sum + project.stars, 0)}
             </div>
             <div className="text-muted-foreground">Total Stars</div>
           </CardContent>
@@ -184,7 +193,7 @@ export default function ExploreProjectsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">
-              {projects.reduce((sum, project) => sum + project.pullRequests, 0)}
+              {filteredProjects.reduce((sum, project) => sum + project.pullRequests, 0)}
             </div>
             <div className="text-muted-foreground">Total Pull Requests</div>
           </CardContent>
@@ -192,4 +201,4 @@ export default function ExploreProjectsPage() {
       </div>
     </div>
   );
-}
+} 
