@@ -201,7 +201,9 @@ export default function Navbar() {
             </div>
           </>
         ) : (
-          <Button>Login</Button>
+          <Link href="/google-signin">
+            <Button>Login</Button>
+          </Link>
         )}
       </div>
     </header>

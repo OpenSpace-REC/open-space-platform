@@ -317,15 +317,15 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto text-foreground min-h-screen p-2 sm:p-4 bg-background max-w-full">
       {visitCount > 0 && visitCount <= 20 && (
-        <Card className="w-full mb-4 sm:mb-6 bg-transparent border border-gray-700">
+        <Card className="w-full mb-4 sm:mb-6 bg-card border">
           <CardHeader>
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Welcome to Open-Space</h2>
-              <p className="text-xs sm:text-sm text-gray-300">
+              <h2 className="text-xl sm:text-2xl font-bold">Welcome to Open-Space</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Explore the features we've introduced! Check out the feature showcase to learn more.
               </p>
               <Button
-                className="w-full sm:w-auto mt-2 sm:mt-4 text-black bg-white"
+                className="w-full sm:w-auto mt-2 sm:mt-4"
                 onClick={() => window.location.href = "/get-started"}
               >
                 Go to Feature Showcase
