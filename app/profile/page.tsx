@@ -12,6 +12,20 @@ import { useUser } from '@/components/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProjectCard from '@/components/ui/project-card';
 
+interface Vote {
+  id: string;
+  userId: string;
+  projectId: string;
+  createdAt: string;
+}
+
+interface Tag {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+}
+
 interface ProfileData {
   user: {
     id: string;
@@ -33,8 +47,8 @@ interface ProfileData {
         name: string;
         description: string;
         techStack: string[];
-        votes: any[];
-        tags: any[];
+        votes: Vote[];
+        tags: Tag[];
       };
       role: string;
     }>;

@@ -2,11 +2,9 @@ import { Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
-
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "@/components/user-context";
-
-
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -28,14 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${poppins.className} bg-background `}>
-        <SessionProvider>
-        <UserProvider>
-          {children}
-          <Toaster />
-          </UserProvider>
-        </SessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={poppins.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider>
+            <UserProvider>
+              {children}
+              <Toaster />
+            </UserProvider>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

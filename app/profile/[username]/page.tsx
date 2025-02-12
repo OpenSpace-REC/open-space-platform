@@ -14,6 +14,20 @@ import ProjectCard from '@/components/ui/project-card';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
+interface Vote {
+  id: string;
+  userId: string;
+  projectId: string;
+  createdAt: string;
+}
+
+interface Tag {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+}
+
 interface ProfileData {
   user: {
     id: string;
@@ -35,8 +49,8 @@ interface ProfileData {
         name: string;
         description: string;
         techStack: string[];
-        votes: any[];
-        tags: any[];
+        votes: Vote[];
+        tags: Tag[];
       };
       role: string;
     }>;

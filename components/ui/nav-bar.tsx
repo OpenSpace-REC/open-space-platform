@@ -28,6 +28,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -63,12 +64,12 @@ export default function Navbar() {
   );
 
   return (
-    <header className="sticky top-0 w-full py-4 px-4 bg-neutral-900 bg-opacity-30 backdrop-blur-lg z-50">
+    <header className="sticky top-0 w-full py-4 px-4 bg-background/80 dark:bg-neutral-900/80 backdrop-blur-lg border-b border-border z-50">
       <div className="w-full flex justify-between items-center h-auto max-w-7xl mx-auto">
         <Link href="/dashboard" className="text-3xl font-bold text-primary truncate md:text-clip" aria-label="Home">
           <span className="hidden sm:inline">/Open-Space</span>
           <span className="sm:hidden">/OS</span>
-          {routeName && <span className="text-stone-500 hidden sm:inline">{routeName}</span>}
+          {routeName && <span className="text-muted-foreground hidden sm:inline">{routeName}</span>}
         </Link>
         
         {session ? (
@@ -80,6 +81,8 @@ export default function Navbar() {
                   <NavItems />
                 </NavigationMenuList>
               </NavigationMenu>
+              
+              <ThemeToggle />
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -134,11 +137,14 @@ export default function Navbar() {
                   <div className="flex flex-col h-full">
                     <div className="flex items-center justify-between p-4 border-b border-border">
                       <span className="text-lg font-semibold">/Open-Space</span>
-                      <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </SheetClose>
+                      <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <SheetClose asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </SheetClose>
+                      </div>
                     </div>
                     
                     <div className="flex-1 overflow-y-auto">

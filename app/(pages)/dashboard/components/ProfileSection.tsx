@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { type User } from '@/components/user-context';
 
 interface ProfileSectionProps {
   user: {
@@ -23,7 +24,7 @@ interface ProfileSectionProps {
     joinDate?: string;
     rank?: string;
   };
-  updateUser: (user: any) => void;
+  updateUser: (user: User) => void;
 }
 
 interface EditableProfileData {

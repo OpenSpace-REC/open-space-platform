@@ -3,8 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createContext, ReactNode, useContext, useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
-
-type User = {
+export type User = {
   role: string;
   id: string;
   name: string;
