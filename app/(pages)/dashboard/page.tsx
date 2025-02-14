@@ -24,6 +24,7 @@ import { CuratorTools } from './components/CuratorTools';
 import { ActivityOverview } from './components/ActivityOverview';
 import { ProjectsSection } from './components/ProjectsSection';
 import { useRouter } from 'next/navigation';
+import DashboardLoading from './loading';
 
 interface ProjectUser {
   user: {
@@ -115,17 +116,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/google-signin');
+      router.replace('/google-signin');
       return;
     }
-    const visits = localStorage.getItem("visitCount");
-    const visitNumber = visits ? parseInt(visits, 10) : 0;
+  }, [isLoading, user, router]);
 
-    if (visitNumber < 10) {
-      setVisitCount(visitNumber + 1);
-      localStorage.setItem("visitCount", (visitNumber + 1).toString());
+  useEffect(() => {
+    if (user) {
+      const visits = localStorage.getItem("visitCount");
+      const visitNumber = visits ? parseInt(visits, 10) : 0;
+      
+      if (visitNumber < 10) {
+        setVisitCount(visitNumber + 1);
+        localStorage.setItem("visitCount", (visitNumber + 1).toString());
+      }
     }
-  }, [user, router, isLoading]);
+  }, [user]);
+
   useEffect(() => {
     if (user) {
       setEditableData({
@@ -136,7 +143,7 @@ export default function DashboardPage() {
   }, [user]);
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[600px] bg-muted" />;
+    return <DashboardLoading />;
   }
 
   if (!user) {
@@ -315,9 +322,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto text-foreground min-h-screen p-2 sm:p-4 bg-background max-w-full">
+    <div className="container mx-auto py-8 space-y-8 bg-background">
       {visitCount > 0 && visitCount <= 20 && (
-        <Card className="w-full mb-4 sm:mb-6 bg-card border">
+        <Card className="w-full bg-card border">
           <CardHeader>
             <div className="space-y-2">
               <h2 className="text-xl sm:text-2xl font-bold">Welcome to Open-Space</h2>
@@ -325,7 +332,7 @@ export default function DashboardPage() {
                 Explore the features we've introduced! Check out the feature showcase to learn more.
               </p>
               <Button
-                className="w-full sm:w-auto mt-2 sm:mt-4"
+                className="w-full sm:w-auto mt-2"
                 onClick={() => window.location.href = "/get-started"}
               >
                 Go to Feature Showcase
@@ -334,7 +341,7 @@ export default function DashboardPage() {
           </CardHeader>
         </Card>
       )}
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-8">
         <ProfileSection user={user} updateUser={updateUser} />
         
         {hasTaggingPermissions(user.role) && (

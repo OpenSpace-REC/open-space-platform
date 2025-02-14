@@ -68,6 +68,13 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
+        // If viewing own profile without username in URL, redirect to username-based URL
+        if (!username && sessionUser?.githubUsername) {
+          window.location.href = `/profile/${sessionUser.githubUsername}`;
+          return;
+        }
+
+        // Fetch profile data based on username
         const response = await fetch(`/api/user/profile/${username}`);
         if (!response.ok) throw new Error('Failed to fetch profile data');
         const data = await response.json();
@@ -79,21 +86,37 @@ export default function ProfilePage() {
       }
     };
 
-    if (username) {
+    if (username || sessionUser?.githubUsername) {
       fetchProfileData();
     }
-  }, [username]);
+  }, [username, sessionUser]);
 
   if (loading) {
-    return <Skeleton className="w-full h-[600px] bg-muted" />;
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <span className="font-bold text-3xl animate-pulse">
+            Open Space
+          </span>
+          <span className="text-muted-foreground animate-pulse">Loading profile...</span>
+        </div>
+      </div>
+    );
   }
 
   if (!profileData) {
     return (
       <div className="container mx-auto text-foreground min-h-screen p-4 bg-background">
-        <Card className="w-full max-w-4xl mx-auto bg-card text-card-foreground">
+        <Card className="w-full max-w-4xl mx-auto bg-card text-card-foreground p-6">
           <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
           <p className="text-muted-foreground">The user profile you're looking for doesn't exist.</p>
+          <Button 
+            variant="outline" 
+            className="mt-4"
+            onClick={() => window.location.href = '/'}
+          >
+            Return Home
+          </Button>
         </Card>
       </div>
     );
@@ -102,8 +125,6 @@ export default function ProfilePage() {
   const { user } = profileData;
   const postedProjects = user.projects.filter(p => p.role === 'OWNER');
   const contributedProjects = user.projects.filter(p => p.role !== 'OWNER');
-
-  // Calculate contribution progress (max 1000 points)
   const contributionProgress = (user.points / 1000) * 100;
 
   return (
@@ -126,11 +147,6 @@ export default function ProfilePage() {
                   <Badge variant="outline" className="border-accent text-accent-foreground">Active</Badge>
                 </div>
                 <p className="mt-2 text-muted-foreground">{user.bio || "No bio available"}</p>
-                {isOwnProfile && (
-                  <Button variant="outline" size="sm" className="mt-2 text-muted-foreground border-muted hover:bg-accent hover:text-accent-foreground">
-                    <Edit3 className="mr-2 h-4 w-4" /> Edit Bio
-                  </Button>
-                )}
               </div>
             </div>
           </CardHeader>
@@ -255,7 +271,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-      <footer className="py-3 text-center text-sm text-muted-foreground">
+      <footer className="text-center py-4 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-accent transition-colors">
           Made with Open Space
         </Link>

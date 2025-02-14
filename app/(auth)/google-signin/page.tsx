@@ -84,22 +84,10 @@ export default function SignUpPage() {
         setName(e.target.value);
     };
 
-    const navigateToDashboard = async () => {
-        console.log("Attempting to navigate to dashboard...");
-        try {
-            // Force a hard navigation to dashboard
-            router.push("/dashboard");
-            // Add a fallback
-            setTimeout(() => {
-                console.log("Fallback: Using window.location");
-                window.location.href = "/dashboard";
-            }, 2000);
-        } catch (error) {
-            console.error("Navigation error:", error);
-            // Final fallback
-            window.location.href = "/dashboard";
-        }
-    };
+    const navigateToDashboard = useCallback(() => {
+        console.log("Navigating to dashboard...");
+        router.replace("/dashboard");
+    }, [router]);
 
     const handleConfirm = async () => {
         if (!session) return;
@@ -134,9 +122,8 @@ export default function SignUpPage() {
                     variant: "default",
                     duration: 5000,
                 });
-                // Wait for toast
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                await navigateToDashboard();
+                // Wait for toast to be visible
+                setTimeout(navigateToDashboard, 1000);
             } else if (!response.ok) {
                 throw new Error('Network response was not ok');
             } else {

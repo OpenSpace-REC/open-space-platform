@@ -50,12 +50,12 @@ export function ProjectResources({
               </div>
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add Project Resource</DialogTitle>
               <DialogDescription>Add resource details</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>Resource Type</Label>
                 <Select
@@ -80,13 +80,48 @@ export function ProjectResources({
                 <Input
                   value={newResource.url}
                   onChange={(e) => onResourceChange('url', e.target.value)}
-                  placeholder="https://i.postimg.cc/your-image-id/image.jpg"
+                  placeholder={
+                    newResource.type === 'image' ? "https://i.postimg.cc/your-image-id/image.jpg" :
+                    newResource.type === 'document' ? "Enter document URL (e.g., PDF link)" :
+                    newResource.type === 'presentation' ? "Enter presentation URL (e.g., Slides link)" :
+                    newResource.type === 'paper' ? "Enter research paper URL (e.g., PDF or DOI link)" :
+                    "Enter resource URL"
+                  }
                 />
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Please use <a href="https://postimages.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">postimages.org</a> to upload your image</p>
-                  <p>Only direct image URLs from i.postimg.cc are accepted</p>
-                  <p>Example: https://i.postimg.cc/image-id/image.jpg</p>
-                </div>
+                {newResource.type === 'image' ? (
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>Please use <a href="https://postimages.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">postimages.org</a> to upload your image</p>
+                    <p>Only direct image URLs from i.postimg.cc are accepted</p>
+                    <p>Example: https://i.postimg.cc/image-id/image.jpg</p>
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    {newResource.type === 'document' && (
+                      <>
+                        <p>Add a link to your document (PDF, DOC, etc.)</p>
+                        <p>You can use services like Google Drive or Dropbox (make sure the link is public)</p>
+                      </>
+                    )}
+                    {newResource.type === 'presentation' && (
+                      <>
+                        <p>Add a link to your presentation (Google Slides, PowerPoint, etc.)</p>
+                        <p>Ensure the presentation is set to public or anyone with the link can view</p>
+                      </>
+                    )}
+                    {newResource.type === 'paper' && (
+                      <>
+                        <p>Add a link to your research paper (PDF or DOI link)</p>
+                        <p>You can use academic repositories or direct PDF links</p>
+                      </>
+                    )}
+                    {newResource.type === 'other' && (
+                      <>
+                        <p>Add a link to your resource</p>
+                        <p>Make sure the link is accessible to others</p>
+                      </>
+                    )}
+                  </div>
+                )}
                 {newResource.type === 'image' && newResource.url && (
                   isValidPostImageUrl(newResource.url) ? (
                     <div className="relative aspect-video overflow-hidden rounded-lg border bg-muted">

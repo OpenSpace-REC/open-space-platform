@@ -54,7 +54,11 @@ export function BasicInfo({
         {!enableGithub && (
           <div className="space-y-4">
             <Label htmlFor="repoSelect">GitHub Repository</Label>
-            <Select onValueChange={onRepoSelect} disabled={isLoadingRepos}>
+            <Select 
+              onValueChange={onRepoSelect} 
+              disabled={isLoadingRepos}
+              value={repositories.find(repo => repo.html_url === project.githubUrl)?.full_name}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={isLoadingRepos ? "Loading repositories..." : "Select a repository"} />
               </SelectTrigger>

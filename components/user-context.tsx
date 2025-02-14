@@ -68,19 +68,25 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.email) {
-      setIsLoading(true);
-      fetch('/api/user')
-        .then((res) => res.json())
-        .then((data) => {
+    const fetchUser = async () => {
+      if (status === 'authenticated' && session?.user?.email) {
+        try {
+          const response = await fetch('/api/user');
+          const data = await response.json();
           if (!data.error) {
             setUser(data);
           }
-        })
-        .catch((error) => console.error('Error fetching user data:', error))
-        .finally(() => setIsLoading(false));
-    } else if (status === 'unauthenticated') {
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
       setIsLoading(false);
+    };
+
+    if (status === 'loading') {
+      setIsLoading(true);
+    } else {
+      fetchUser();
     }
   }, [session, status]);
 

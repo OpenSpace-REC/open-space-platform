@@ -115,7 +115,7 @@ export default function Navbar() {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <Link href="/profile">
+                  <Link href={`/profile/${user?.githubUsername}`}>
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                   </Link>
                   <DropdownMenuItem onClick={() => signOut()}>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,13 @@ export async function GET(
 ) {
   try {
     const username = params.username;
+    const session = await auth();
+    const isOwnProfile = session?.user?.email ? 
+      (await prisma.user.findUnique({ 
+        where: { email: session.user.email },
+        select: { githubUsername: true }
+      }))?.githubUsername === username 
+      : false;
 
     // Fetch user data with their projects
     const user = await prisma.user.findUnique({
@@ -44,12 +52,13 @@ export async function GET(
     const projectsContributed = user.projects.filter(p => p.role !== 'OWNER').length;
     const tagsCreated = user.projectTags.length;
 
-    // Remove sensitive information for non-own profiles
+    // Only remove email if it's not the user's own profile
     const { email, ...publicUser } = user;
+    const userData = isOwnProfile ? user : publicUser;
 
     return NextResponse.json({
       user: {
-        ...publicUser,
+        ...userData,
         projectsPosted,
         projectsContributed,
         tagsCreated,

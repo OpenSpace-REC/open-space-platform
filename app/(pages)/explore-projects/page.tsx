@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +13,8 @@ import {
   Filter,
   Star,
   GitPullRequest,
-  Code
+  Code,
+  RefreshCw
 } from 'lucide-react';
 
 interface ProjectUser {
@@ -49,6 +49,7 @@ export default function ExploreProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     language: '',
     minStars: 0,
@@ -56,26 +57,72 @@ export default function ExploreProjectsPage() {
   });
   const router = useRouter();
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
+  const fetchProjects = async (forceRefresh = false) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/projects');
+      // Only check cache on client side
+      if (typeof window !== 'undefined' && !forceRefresh) {
+        const cachedData = sessionStorage.getItem('exploreProjects');
+        const cachedTimestamp = sessionStorage.getItem('exploreProjectsTimestamp');
+        
+        if (cachedData && cachedTimestamp) {
+          const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+          const now = Date.now();
+          
+          if (now - parseInt(cachedTimestamp) < CACHE_DURATION) {
+            setProjects(JSON.parse(cachedData));
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
+      if (forceRefresh) {
+        setIsRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
+      const response = await fetch('/api/projects', {
+        // Add cache busting query param for force refresh
+        cache: forceRefresh ? 'no-store' : 'default',
+        headers: forceRefresh ? {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        } : {}
+      });
+      
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
       const data = await response.json();
-      setProjects(data.map((project: Project) => ({ ...project, users: project.users || [] })));
+      const processedData = data.map((project: Project) => ({ ...project, users: project.users || [] }));
+      
+      // Only cache on client side
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('exploreProjects', JSON.stringify(processedData));
+        sessionStorage.setItem('exploreProjectsTimestamp', Date.now().toString());
+      }
+      
+      setProjects(processedData);
     } catch (err) {
       setError('An error occurred while fetching projects');
       console.error(err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
+
+  const handleRefresh = () => {
+    fetchProjects(true);
+  };
+
+  useEffect(() => {
+    // Ensure we're on client side before initial fetch
+    if (typeof window !== 'undefined') {
+      fetchProjects();
+    }
+  }, []); // Only run once on mount
 
   const uniqueLanguages = useMemo(() => {
     const languages = new Set(projects.map(project => project.language));
@@ -128,10 +175,18 @@ export default function ExploreProjectsPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-8">
- 
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Explore Projects</h1>
-        
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
+        </Button>
       </div>
 
       <section>
