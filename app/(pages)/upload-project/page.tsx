@@ -60,7 +60,15 @@ export default function UploadProjectsPage() {
   const fetchUserRepositories = async (username: string) => {
     setIsLoadingRepos(true)
     try {
-      const response = await fetch(`https://api.github.com/users/${username}/repos`)
+      const tokenResponse = await fetch('/api/github/token')
+      if (!tokenResponse.ok) throw new Error('Failed to fetch GitHub token')
+      const { token } = await tokenResponse.json()
+      
+      const response = await fetch(`https://api.github.com/users/${username}/repos`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       if (!response.ok) throw new Error('Failed to fetch repositories')
       const data = await response.json()
       setRepositories(data)

@@ -9,9 +9,17 @@ export const isValidPostImageUrl = (url: string): boolean => {
 
 export const verifyGithubUsername = async (username: string): Promise<boolean> => {
   try {
-    const response = await fetch(`https://api.github.com/users/${username}`);
-    return response.status === 200;
+    const tokenResponse = await fetch('/api/github/token')
+    if (!tokenResponse.ok) return false
+    const { token } = await tokenResponse.json()
+
+    const response = await fetch(`https://api.github.com/users/${username}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return response.status === 200
   } catch {
-    return false;
+    return false
   }
-}; 
+} 
