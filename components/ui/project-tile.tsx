@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
-import { StarIcon, GitPullRequestIcon, CodeIcon, UsersIcon } from 'lucide-react';
+import { CodeIcon, UsersIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
 interface ProjectUser {
@@ -23,8 +23,6 @@ interface Project {
   imageUrl: string | null;
   users: ProjectUser[];
   language?: string;
-  pullRequests?: number;
-  stars?: number;
 }
 
 interface ProjectTileProps {
@@ -95,7 +93,6 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                   </Tooltip>
                 </TooltipProvider>
                 
-                {/* GitHub Stats with updated colors */}
                 <div className="flex items-center space-x-3 text-zinc-400">
                   {project.language && (
                     <TooltipProvider>
@@ -109,32 +106,6 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                         <TooltipContent className="bg-zinc-800 border-zinc-700">
                           Primary Language
                         </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {project.stars !== undefined && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center space-x-1">
-                            <StarIcon className="w-4 h-4" />
-                            <span className="text-xs">{project.stars}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>GitHub Stars</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {project.pullRequests !== undefined && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center space-x-1">
-                            <GitPullRequestIcon className="w-4 h-4" />
-                            <span className="text-xs">{project.pullRequests}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>Pull Requests</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}
@@ -278,7 +249,6 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                   </Tooltip>
                 </TooltipProvider>
                 
-                {/* GitHub Stats with updated colors */}
                 <div className="flex items-center space-x-3 text-zinc-400">
                   {project.language && (
                     <TooltipProvider>
@@ -292,32 +262,6 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                         <TooltipContent className="bg-zinc-800 border-zinc-700">
                           Primary Language
                         </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {project.stars !== undefined && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center space-x-1">
-                            <StarIcon className="w-4 h-4" />
-                            <span className="text-xs">{project.stars}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>GitHub Stars</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  {project.pullRequests !== undefined && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center space-x-1">
-                            <GitPullRequestIcon className="w-4 h-4" />
-                            <span className="text-xs">{project.pullRequests}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>Pull Requests</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   )}

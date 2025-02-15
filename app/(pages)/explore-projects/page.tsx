@@ -46,7 +46,6 @@ interface Project {
 
 interface FilterOptions {
   language: string;
-  minStars: number;
   searchQuery: string;
   department: string;
   club: string;
@@ -107,22 +106,6 @@ const StatsSection = memo(({ projects }: { projects: Project[] }) => (
         <div className="text-muted-foreground">Total Projects</div>
       </CardContent>
     </Card>
-    <Card>
-      <CardContent className="p-4">
-        <div className="text-2xl font-bold">
-          {projects.reduce((sum, project) => sum + project.stars, 0)}
-        </div>
-        <div className="text-muted-foreground">Total Stars</div>
-      </CardContent>
-    </Card>
-    <Card>
-      <CardContent className="p-4">
-        <div className="text-2xl font-bold">
-          {projects.reduce((sum, project) => sum + project.pullRequests, 0)}
-        </div>
-        <div className="text-muted-foreground">Total Pull Requests</div>
-      </CardContent>
-    </Card>
   </div>
 ));
 StatsSection.displayName = 'StatsSection';
@@ -135,7 +118,6 @@ export default function ExploreProjectsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     language: 'all',
-    minStars: 0,
     searchQuery: '',
     department: 'all',
     club: 'all',
@@ -158,7 +140,6 @@ export default function ExploreProjectsPage() {
       const queryParams = new URLSearchParams();
       if (searchQuery?.trim()) queryParams.append('search', searchQuery.trim());
       if (filters.language !== 'all') queryParams.append('language', filters.language);
-      if (filters.minStars > 0) queryParams.append('minStars', filters.minStars.toString());
       if (filters.department !== 'all') queryParams.append('department', filters.department);
       if (filters.club !== 'all') queryParams.append('club', filters.club);
 
@@ -275,7 +256,6 @@ export default function ExploreProjectsPage() {
   }, [
     filters.searchQuery,
     filters.language,
-    filters.minStars,
     filters.department,
     filters.club,
     debouncedFetch,
@@ -372,20 +352,6 @@ export default function ExploreProjectsPage() {
                 {club}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filters.minStars.toString()}
-          onValueChange={(value) => setFilters({ ...filters, minStars: parseInt(value) })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Minimum Stars" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="0">All Stars</SelectItem>
-            <SelectItem value="10">10+ Stars</SelectItem>
-            <SelectItem value="50">50+ Stars</SelectItem>
-            <SelectItem value="100">100+ Stars</SelectItem>
           </SelectContent>
         </Select>
       </div>

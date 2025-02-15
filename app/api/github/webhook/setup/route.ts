@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const webhookUrl = 'https://laptop-483nic2i.tail7526d.ts.net/api/github/webhook/listen';
+    const webhookUrl = 'https://www.open-space.xyz/api/github/webhook/listen';
 
     console.log('Webhook URL:', webhookUrl);
 
