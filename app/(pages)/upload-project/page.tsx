@@ -27,6 +27,8 @@ export default function UploadProjectsPage() {
     problemStatement: '',
     status: 'In Development',
     projectType: '',
+    department: '',
+    club: '',
     keyFeatures: [''],
     academicHighlights: [],
     resources: [],
@@ -320,6 +322,8 @@ export default function UploadProjectsPage() {
       problemStatement: '',
       status: 'In Development',
       projectType: '',
+      department: '',
+      club: '',
       keyFeatures: [''],
       academicHighlights: [],
       resources: [],
@@ -361,7 +365,7 @@ export default function UploadProjectsPage() {
   }
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="container mx-auto py-8 space-y-8 bg-background">
       <Card className="mb-6 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">

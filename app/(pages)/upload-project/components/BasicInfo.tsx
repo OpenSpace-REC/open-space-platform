@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Github } from 'lucide-react'
+import { Github, Loader2 } from 'lucide-react'
 import { Project, Repository, CHAR_LIMITS } from './types'
 
 interface BasicInfoProps {
@@ -30,6 +30,27 @@ export function BasicInfo({
   onEnableGithubChange,
   onRepoSelect
 }: BasicInfoProps) {
+  const departments = [
+    'Computer Science',
+    'Electronics and Communication',
+    'Mechanical',
+    'Civil',
+    'Electrical',
+    'Chemical',
+    'Biotechnology',
+    'Other'
+  ]
+
+  const clubs = [
+    'Coding Club',
+    'Robotics Club',
+    'IEEE Student Branch',
+    'Innovation Club',
+    'Research Club',
+    'Design Club',
+    'Other'
+  ]
+
   return (
     <Card>
       <CardHeader>
@@ -94,6 +115,44 @@ export function BasicInfo({
               <span>Min: {CHAR_LIMITS.name.min} characters</span>
             </div>
             {errors.name && <p className="text-destructive text-xs mt-1">{errors.name}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="department">Department</Label>
+            <Select
+              value={project.department}
+              onValueChange={(value) => onProjectChange('department', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="club">Club</Label>
+            <Select
+              value={project.club}
+              onValueChange={(value) => onProjectChange('club', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select club" />
+              </SelectTrigger>
+              <SelectContent>
+                {clubs.map((club) => (
+                  <SelectItem key={club} value={club}>
+                    {club}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

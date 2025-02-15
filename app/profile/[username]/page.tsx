@@ -43,6 +43,7 @@ interface ProfileData {
     projectsPosted: number;
     projectsContributed: number;
     tagsCreated: number;
+    techStack: string[];
     projects: Array<{
       project: {
         id: string;
@@ -180,6 +181,22 @@ export default function ProfilePage() {
             </div>
 
             <Separator className="bg-border" />
+
+            {user.techStack && user.techStack.length > 0 && (
+              <>
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Technologies Used</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {user.techStack.map((tech, index) => (
+                      <Badge key={index} variant="secondary" className="bg-secondary text-secondary-foreground">
+                        {tech}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <Separator className="bg-border" />
+              </>
+            )}
 
             <div>
               <h2 className="text-lg font-semibold mb-2">Contribution Overview</h2>

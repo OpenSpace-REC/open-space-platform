@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { Resource } from '@/app/types/project';
 
 async function getNextProjectId() {
   const year = new Date().getFullYear();
@@ -12,9 +13,9 @@ async function getNextProjectId() {
   return `${year}-${String(counter.count).padStart(4, '0')}`;
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
+    const body = await request.json();
     const {
       name,
       description,
@@ -25,48 +26,85 @@ export async function POST(req: Request) {
       problemStatement,
       status,
       projectType,
+      department,
+      club,
       keyFeatures,
       resources,
       users,
       ownerId,
     } = body;
 
-    const userPromises = users.map(async (user: { githubUsername: string; role: string }) => {
-      const existingUser = await prisma.user.findUnique({
-        where: { githubUsername: user.githubUsername }
+    // Check if a project with the same GitHub URL already exists
+    if (githubUrl) {
+      const existingProject = await prisma.project.findUnique({
+        where: { githubUrl },
       });
-      return {
-        ...user,
-        exists: !!existingUser
-      };
+
+      if (existingProject) {
+        return NextResponse.json(
+          { error: 'Project with this GitHub URL already exists' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Get the current counter value
+    const counter = await prisma.counter.findUnique({
+      where: { id: 'project_counter' },
     });
 
-    const userResults = await Promise.all(userPromises);
-    const existingUsers = userResults.filter(user => user.exists);
-    const pendingUsers = userResults.filter(user => !user.exists);
+    // If counter doesn't exist, create it
+    if (!counter) {
+      await prisma.counter.create({
+        data: {
+          id: 'project_counter',
+          count: 0,
+        },
+      });
+    }
 
-    const projectId = await getNextProjectId();
+    // Increment counter and get new value
+    const updatedCounter = await prisma.counter.update({
+      where: { id: 'project_counter' },
+      data: { count: { increment: 1 } },
+    });
 
+    // Generate project ID
+    const projectId = `PRJ${String(updatedCounter.count).padStart(5, '0')}`;
+
+    // First, fetch all users by their GitHub usernames to get their actual IDs
+    const userGithubUsernames = users.map((user: { githubUsername: string }) => user.githubUsername);
+    const dbUsers = await prisma.user.findMany({
+      where: {
+        githubUsername: {
+          in: userGithubUsernames
+        }
+      }
+    });
+
+    // Create a mapping of GitHub usernames to user IDs
+    const usernameToIdMap = new Map(
+      dbUsers.map(user => [user.githubUsername, user.id])
+    );
+
+    // Create project with proper user IDs
     const project = await prisma.project.create({
       data: {
         id: projectId,
         name,
         description,
-        ...(githubUrl ? { githubUrl } : {}),
+        githubUrl,
         demoUrl,
         techStack,
         imageUrl,
         problemStatement,
         status,
         projectType,
+        department,
+        club,
         keyFeatures,
         resources: {
-          create: resources.map((resource: {
-            url: string;
-            title: string;
-            type: string;
-            description: string;
-          }) => ({
+          create: resources.map((resource: Resource) => ({
             url: resource.url,
             title: resource.title,
             type: resource.type,
@@ -74,20 +112,12 @@ export async function POST(req: Request) {
           }))
         },
         users: {
-          create: existingUsers.map((user) => ({
-            role: user.role,
-            user: {
-              connect: {
-                githubUsername: user.githubUsername,
-              },
-            },
-          })),
-        },
-        pendingUsers: {
-          create: pendingUsers.map((user) => ({
-            githubUsername: user.githubUsername,
-            role: user.role,
-          })),
+          create: users
+            .filter((user: { githubUsername: string; role: string }) => usernameToIdMap.has(user.githubUsername))
+            .map((user: { githubUsername: string; role: string }) => ({
+              userId: usernameToIdMap.get(user.githubUsername),
+              role: user.role,
+            }))
         },
       },
       include: {
@@ -96,7 +126,6 @@ export async function POST(req: Request) {
             user: true,
           },
         },
-        pendingUsers: true,
         resources: true,
       },
     });
@@ -104,22 +133,6 @@ export async function POST(req: Request) {
     return NextResponse.json(project);
   } catch (error) {
     console.error('Error creating project:', error);
-    
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        return NextResponse.json(
-          { error: 'A project with this GitHub URL already exists' },
-          { status: 409 }
-        );
-      }
-      if (error.code === 'P2025') {
-        return NextResponse.json(
-          { error: 'One or more users could not be found' },
-          { status: 404 }
-        );
-      }
-    }
-
     return NextResponse.json(
       { error: 'Failed to create project' },
       { status: 500 }

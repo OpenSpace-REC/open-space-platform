@@ -20,10 +20,11 @@ export async function GET() {
         projects: {
           include: {
             project: {
-              include: {
+              select: {
                 tags: true,
                 projectImages: true,
                 votes: true,
+                techStack: true,
               }
             }
           }
@@ -46,12 +47,21 @@ export async function GET() {
     const projectsContributed = user.projects.filter(p => p.role !== 'OWNER').length;
     const tagsCreated = user.projectTags.length;
 
+    const techStackSet = new Set<string>();
+    user.projects.forEach(projectUser => {
+      if (projectUser.project.techStack) {
+        projectUser.project.techStack.forEach(tech => techStackSet.add(tech));
+      }
+    });
+    const techStack = Array.from(techStackSet);
+
     return NextResponse.json({
       user: {
         ...user,
         projectsPosted,
         projectsContributed,
         tagsCreated,
+        techStack,
       }
     });
 

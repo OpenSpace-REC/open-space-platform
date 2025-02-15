@@ -18,7 +18,9 @@ import {
   Presentation,
   ScrollText,
   Link as LinkIcon,
-  Clock
+  Clock,
+  Building,
+  Users2
 } from 'lucide-react';
 import Image from 'next/image'
 import type { Project, Resource } from '@/app/types/project';
@@ -26,7 +28,63 @@ import type { Project, Resource } from '@/app/types/project';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-async function getProjectData(id: string): Promise<Project> {
+type ProjectMember = {
+  id: string;
+  role: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    githubUsername: string;
+    githubProfileUrl: string;
+    githubAvatarUrl: string;
+    bio: string | null;
+  };
+};
+
+type PendingMember = {
+  id: string;
+  githubUsername: string;
+  role: string;
+};
+
+type ProjectTag = {
+  id: string;
+  name: string;
+  title: string | null;
+  status: string | null;
+  conference: string | null;
+  date: string | null;
+  competition: string | null;
+  curator: {
+    id: string;
+    name: string;
+  } | null;
+  createdAt: string;
+};
+
+type ProjectData = {
+  id: string;
+  name: string;
+  description?: string;
+  problemStatement?: string;
+  githubUrl?: string;
+  demoUrl?: string;
+  techStack: string[];
+  imageUrl?: string;
+  status: string;
+  projectType: string;
+  department?: string;
+  club?: string;
+  keyFeatures: string[];
+  projectImages: string[];
+  users: ProjectMember[];
+  pendingUsers: PendingMember[];
+  tags: ProjectTag[];
+  resources: Resource[];
+};
+
+async function getProjectData(id: string): Promise<ProjectData> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   if (!baseUrl) throw new Error('API base URL is not configured');
 
@@ -58,7 +116,7 @@ function getProjectTypeBadge(type: string): "default" | "secondary" | "outline" 
 
 async function ProjectPage({ params }: { params: { id: string } }) {
   try {
-    const project: Project = await getProjectData(params.id);
+    const project: ProjectData = await getProjectData(params.id);
 
     console.log('Project Data:', {
       users: project.users,
@@ -95,6 +153,20 @@ async function ProjectPage({ params }: { params: { id: string } }) {
                 <CardDescription className="mt-2 text-base sm:text-lg">
                   {projectData.description || 'No description available'}
                 </CardDescription>
+                <div className="flex flex-wrap gap-4 mt-3">
+                  {projectData.department && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Building className="h-4 w-4" />
+                      <span className="text-sm">{projectData.department}</span>
+                    </div>
+                  )}
+                  {projectData.club && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Users2 className="h-4 w-4" />
+                      <span className="text-sm">{projectData.club}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             

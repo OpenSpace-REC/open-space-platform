@@ -4,6 +4,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 import { UserProvider } from "@/components/user-context";
 
 const poppins = Poppins({
@@ -38,6 +39,7 @@ export default function RootLayout({
             <UserProvider>
               {children}
               <Toaster />
+              <SonnerToaster position="bottom-right" />
             </UserProvider>
           </SessionProvider>
         </ThemeProvider>

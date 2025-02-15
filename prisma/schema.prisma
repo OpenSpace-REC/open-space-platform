@@ -21,6 +21,7 @@ model User {
   joinDate          DateTime      @default(now())
   githubAccessToken String?
   points            Int           @default(0)
+  techStack         String[]      @default([])
   projectTags       ProjectTag[]
   projects          ProjectUser[]
 }
@@ -41,6 +42,8 @@ model Project {
   imageUrl         String?
   status           String
   projectType      String
+  department       String?
+  club             String?
   keyFeatures      String[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

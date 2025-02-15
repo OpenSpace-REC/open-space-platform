@@ -39,6 +39,8 @@ export interface Project {
   problemStatement: string;
   status: string;
   projectType: string;
+  department: string;
+  club: string;
   keyFeatures: string[];
   academicHighlights: { title: string; status: string; conference?: string; date?: string; competition?: string }[];
   resources: ProjectResource[];

@@ -51,6 +51,8 @@ export async function PATCH(
       problemStatement,
       status,
       projectType,
+      department,
+      club,
       keyFeatures,
       resources,
       users,
@@ -84,6 +86,8 @@ export async function PATCH(
         problemStatement,
         status,
         projectType,
+        department,
+        club,
         keyFeatures,
         resources: {
           deleteMany: {},
@@ -111,6 +115,8 @@ export async function PATCH(
           },
         },
         resources: true,
+        projectImages: true,
+        tags: true,
       },
     });
 

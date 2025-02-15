@@ -43,13 +43,14 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, bio } = body;
+    const { name, bio, techStack } = body;
 
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
         name: name,
         bio: bio,
+        techStack: techStack,
       },
       include: {
         projects: {
