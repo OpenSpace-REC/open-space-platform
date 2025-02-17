@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, UserIcon, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -35,7 +35,7 @@ export default function Navbar() {
   const routeName = pathname === "/" ? "" : `/${pathname.slice(1)}`;
   const { user } = useUser();
   const { data: session } = useSession();
-
+  const [sheetState, setSheetState] = useState<boolean>(false);
 
   const getUserInitials = (name: string) => {
     return name
@@ -71,7 +71,7 @@ export default function Navbar() {
           <span className="sm:hidden">/OS</span>
           {routeName && <span className="text-muted-foreground hidden sm:inline">{routeName}</span>}
         </Link>
-        
+
         {session ? (
           <>
             {/* Desktop Navigation */}
@@ -81,9 +81,9 @@ export default function Navbar() {
                   <NavItems />
                 </NavigationMenuList>
               </NavigationMenu>
-              
+
               <ThemeToggle />
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
@@ -127,26 +127,28 @@ export default function Navbar() {
 
             {/* Mobile Navigation */}
             <div className="md:hidden">
-              <Sheet>
+              <Sheet open={sheetState} onOpenChange={() => setSheetState(prev => !prev)}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative -mr-2">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[80%] sm:w-[350px] p-0">
+                <SheetContent side="right" className="w-[80%] sm:w-[350px] p-0 [&>button]:hidden">
                   <div className="flex flex-col h-full">
-                    <div className="flex items-center justify-between p-4 border-b border-border">
-                      <span className="text-lg font-semibold">/Open-Space</span>
-                      <div className="flex items-center gap-2">
-                        <ThemeToggle />
-                        <SheetClose asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </SheetClose>
+                    <div className="grid grid-cols-[90%_10%] items-center w-full p-4 border-b border-border">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold">/Open-Space</span>
+                        <div className="flex items-center gap-2">
+                          <ThemeToggle />
+                        </div>
                       </div>
+                      <SheetClose asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </SheetClose>
                     </div>
-                    
+
                     <div className="flex-1 overflow-y-auto">
                       <div className="flex flex-col p-4 space-y-6">
                         <div className="flex items-center gap-3">
@@ -166,13 +168,13 @@ export default function Navbar() {
                           </div>
                         </div>
 
-                        <nav className="space-y-2">
-                          <Link href="/dashboard" className="w-full">
+                        <nav className="space-y-1">
+                          <Link onClick={() => setSheetState(prev => !prev)} href="/dashboard" className="w-full h-[50px]">
                             <Button variant="ghost" className="w-full justify-start text-base">
                               Dashboard
                             </Button>
                           </Link>
-                          <Link href="/explore-projects" className="w-full">
+                          <Link onClick={() => setSheetState(prev => !prev)} href="/explore-projects" className="w-full h-[50px]">
                             <Button variant="ghost" className="w-full justify-start text-base">
                               Explore Projects
                             </Button>
@@ -181,18 +183,18 @@ export default function Navbar() {
                       </div>
                     </div>
 
-                    <div className="border-t border-border p-4 space-y-2">
-                      <Link href="/profile" className="w-full">
-                        <Button variant="ghost" className="w-full justify-start text-base">
-                          Profile
+                    <div className="border-t border-border p-4 flex items-center justify-between w-full">
+                      <Link href="/profile" className="w-[44px] h-[44px] bg-gray-50/10 rounded-full text-base flex items-center justify-center">
+                        <Button variant="ghost" className="w-full h-full justify-start text-base p-3">
+                          <UserIcon className="h-[40px] w-[40px] block scale-95" />
                         </Button>
                       </Link>
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-base text-red-500 hover:text-red-500 hover:bg-red-50/10"
+                        className="w-[44px] h-[44px] justify-start text-base text-red-500 hover:text-red-500 hover:bg-red-50/10 p-3"
                         onClick={() => signOut()}
                       >
-                        Logout
+                        <LogOut className="h-[40px] w-[40px] block scale-95" />
                       </Button>
                     </div>
                   </div>
