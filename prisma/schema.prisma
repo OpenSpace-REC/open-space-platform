@@ -32,21 +32,21 @@ model Counter {
 }
 
 model Project {
-  id               String   @id 
+  id               String               @id
   name             String
   description      String?
   problemStatement String?
-  githubUrl        String?  @unique
+  githubUrl        String?              @unique
   demoUrl          String?
   techStack        String[]
   imageUrl         String?
   status           String
   projectType      String
-  department       String?
-  club             String?
   keyFeatures      String[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  club             String?
+  department       String?
   pendingUsers     PendingProjectUser[]
   projectImages    ProjectImage[]
   resources        ProjectResource[]
