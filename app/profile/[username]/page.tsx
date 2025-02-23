@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Github, Mail, Calendar, Edit3, Code, GitPullRequest, GitMerge, Activity } from "lucide-react";
 import { useUser } from '@/components/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import ProjectCard from '@/components/ui/project-card';
+import ProjectCard from '@/components/ui/project-tile';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -26,6 +26,26 @@ interface Tag {
   name: string;
   description?: string;
   createdAt: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  githubUrl: string;
+  techStack: string[];
+  imageUrl: string | null;
+  users: {
+    user: {
+      name: string;
+      githubAvatarUrl: string | null;
+      githubUsername: string;
+    };
+    role: string;
+  }[];
+  language: string;
+  pullRequests: number;
+  stars: number;
 }
 
 interface ProfileData {
@@ -52,6 +72,14 @@ interface ProfileData {
         techStack: string[];
         votes: Vote[];
         tags: Tag[];
+        users: Array<{
+          user: {
+            name: string;
+            githubAvatarUrl: string | null;
+            githubUsername: string;
+          };
+          role: string;
+        }>;
       };
       role: string;
     }>;
@@ -247,17 +275,25 @@ export default function ProfilePage() {
               <TabsContent value="posted" className="mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {postedProjects.map(({ project }) => (
-                    <ProjectCard 
-                      key={project.id} 
-                      project={{
-                        id: project.id,
-                        name: project.name,
-                        description: project.description || '',
-                        language: project.techStack[0] || 'N/A',
-                        pullRequests: project.tags.length,
-                        stars: project.votes.length
-                      }} 
-                    />
+                    <div key={project.id} className="w-full">
+                      <ProjectCard 
+                        project={{
+                          id: project.id,
+                          name: project.name,
+                          description: project.description || '',
+                          githubUrl: '',
+                          techStack: project.techStack,
+                          imageUrl: null,
+                          users: project.users || [],
+                          language: project.techStack[0] || 'N/A'
+                        }}
+                        onClick={() => {
+                          if (project.id) {
+                            window.location.href = `/project/${project.id}`;
+                          }
+                        }}
+                      />
+                    </div>
                   ))}
                   {postedProjects.length === 0 && (
                     <p className="text-muted-foreground col-span-2 text-center py-4">No projects posted yet</p>
@@ -267,17 +303,25 @@ export default function ProfilePage() {
               <TabsContent value="contributed" className="mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {contributedProjects.map(({ project }) => (
-                    <ProjectCard 
-                      key={project.id} 
-                      project={{
-                        id: project.id,
-                        name: project.name,
-                        description: project.description || '',
-                        language: project.techStack[0] || 'N/A',
-                        pullRequests: project.tags.length,
-                        stars: project.votes.length
-                      }} 
-                    />
+                    <div key={project.id} className="w-full">
+                      <ProjectCard 
+                        project={{
+                          id: project.id,
+                          name: project.name,
+                          description: project.description || '',
+                          githubUrl: '',
+                          techStack: project.techStack,
+                          imageUrl: null,
+                          users: project.users || [],
+                          language: project.techStack[0] || 'N/A'
+                        }}
+                        onClick={() => {
+                          if (project.id) {
+                            window.location.href = `/project/${project.id}`;
+                          }
+                        }}
+                      />
+                    </div>
                   ))}
                   {contributedProjects.length === 0 && (
                     <p className="text-muted-foreground col-span-2 text-center py-4">No contributions yet</p>
