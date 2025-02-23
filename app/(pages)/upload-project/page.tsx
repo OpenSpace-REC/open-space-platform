@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { FileCode2, Github, Loader2, Send } from 'lucide-react'
+import { BookOpen, ChevronRight, FileCode2, Github, Info, Lightbulb, Loader2, Send, Users } from 'lucide-react'
 import { useUser } from '@/components/user-context'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
@@ -14,6 +14,7 @@ import { ProjectResources } from './components/ProjectResources'
 import { SubmitDialog } from './components/SubmitDialog'
 import { Project, ProjectResource, ProjectUser, Repository } from './components/types'
 import { isValidPostImageUrl, verifyGithubUsername } from './components/utils'
+import { cn } from '@/lib/utils'
 
 export default function UploadProjectsPage() {
   const { user } = useUser();
@@ -65,7 +66,7 @@ export default function UploadProjectsPage() {
       const tokenResponse = await fetch('/api/github/token')
       if (!tokenResponse.ok) throw new Error('Failed to fetch GitHub token')
       const { token } = await tokenResponse.json()
-      
+
       const response = await fetch(`https://api.github.com/users/${username}/repos`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -128,7 +129,7 @@ export default function UploadProjectsPage() {
     });
 
     const isValid = await verifyGithubUsername(newProjectUser.githubUsername);
-    
+
     loadingToast.dismiss();
 
     if (!isValid) {
@@ -214,14 +215,14 @@ export default function UploadProjectsPage() {
       formErrors.keyFeatures = ['At least one key feature is required']
     }
     if (projectUsers.length === 0) formErrors.projectUsers = 'At least one user is required'
-    
+
     if (project.demoUrl && !/^https?:\/\/.*/.test(project.demoUrl)) {
       formErrors.demoUrl = 'Invalid demo URL format'
     }
     if (project.imageUrl && !/^https?:\/\/.*/.test(project.imageUrl)) {
       formErrors.imageUrl = 'Invalid image URL format'
     }
-    
+
     setErrors(formErrors)
     return Object.keys(formErrors).length === 0
   }
@@ -379,8 +380,8 @@ export default function UploadProjectsPage() {
               <p className="text-muted-foreground">Share your work</p>
             </div>
           </div>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             disabled={!isFormValid || isSubmitting}
             className="w-32"
           >
@@ -399,26 +400,30 @@ export default function UploadProjectsPage() {
         </div>
       </Card>
 
-      <Tabs defaultValue="basic" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="basic" className="space-x-2">
-            <FileCode2 className="h-4 w-4" />
+      <Tabs defaultValue="basic" className="w-full max-w-3xl mx-auto">
+        <TabsList className="flex items-center space-x-1 h-max flex-wrap bg-transparent w-full p-1 rounded-lg border">
+          <TabsTrigger value="basic" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
+            <Info className="h-4 w-4" />
             <span>Basic Info</span>
           </TabsTrigger>
-          <TabsTrigger value="details" className="space-x-2">
+          <ChevronRight className='size-3' />
+          <TabsTrigger value="details" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
             <FileCode2 className="h-4 w-4" />
             <span>Details</span>
           </TabsTrigger>
-          <TabsTrigger value="features" className="space-x-2">
-            <FileCode2 className="h-4 w-4" />
+          <ChevronRight className='size-3' />
+          <TabsTrigger value="features" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
+            <Lightbulb className="h-4 w-4" />
             <span>Features</span>
           </TabsTrigger>
-          <TabsTrigger value="team" className="space-x-2">
-            <FileCode2 className="h-4 w-4" />
+          <ChevronRight className='size-3' />
+          <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
+            <Users className="h-4 w-4" />
             <span>Team</span>
           </TabsTrigger>
-          <TabsTrigger value="resources" className="space-x-2">
-            <FileCode2 className="h-4 w-4" />
+          <ChevronRight className='size-3' />
+          <TabsTrigger value="resources" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
+            <BookOpen className="h-4 w-4" />
             <span>Resources</span>
           </TabsTrigger>
         </TabsList>
