@@ -322,41 +322,20 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8 bg-background">
-      {visitCount > 0 && visitCount <= 20 && (
-        <Card className="w-full bg-card border">
-          <CardHeader>
-            <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold">Welcome to Open-Space</h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Explore the features we've introduced! Check out the feature showcase to learn more.
-              </p>
-              <Button
-                className="w-full sm:w-auto mt-2"
-                onClick={() => window.location.href = "/get-started"}
-              >
-                Go to Feature Showcase
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-      )}
-      <div className="space-y-8">
+    <div className="container mx-auto p-4">
+      <div className="grid gap-4">
         <ProfileSection user={user} updateUser={updateUser} />
-        
-        {hasTaggingPermissions(user.role) && (
-          <CuratorTools hasTaggingPermissions={true} />
+        {(user.role === 'CURATOR' || user.role === 'ADMIN') && (
+          <CuratorTools user={user} />
         )}
-
         <ActivityOverview 
-          ownedProjects={ownedProjects}
-          contributedProjects={contributedProjects}
+          projects={user.projects}
+          points={user.points || 0}
         />
 
-        <ProjectsSection 
-          ownedProjects={ownedProjects}
-          contributedProjects={contributedProjects}
-        />
+        <ProjectsSection user={user} />
+        
+        
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ export function ProjectDetails({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="projectType">Project Type</Label>
-              <Select onValueChange={(value) => onProjectChange('projectType', value)}>
+              <Select value={project.projectType} onValueChange={(value) => onProjectChange('projectType', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select project type" />
                 </SelectTrigger>
@@ -66,7 +66,7 @@ export function ProjectDetails({
 
             <div>
               <Label htmlFor="status">Project Status</Label>
-              <Select onValueChange={(value) => onProjectChange('status', value)}>
+              <Select value={project.status} onValueChange={(value) => onProjectChange('status', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>

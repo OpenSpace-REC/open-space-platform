@@ -227,24 +227,26 @@ export default function ProfilePage() {
             )}
 
             <div>
-              <h2 className="text-lg font-semibold mb-2">Contribution Overview</h2>
+              <h2 className="text-lg font-semibold mb-2">Activity Overview</h2>
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-muted-foreground">Total Points</span>
+                <Card className="bg-muted p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Activity size={18} className="text-muted-foreground" />
+                      <span className="font-medium">Contribution Points</span>
+                    </div>
                     <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                      <Activity size={14} className="mr-1" />
-                      {user.points}
+                      {user.points} points
                     </Badge>
                   </div>
-                  <Progress value={contributionProgress} max={100} className="h-2 bg-secondary" />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <p className="text-xs text-muted-foreground mt-2">Points reflect your overall contribution to the platform</p>
+                </Card>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Card className="bg-muted">
                     <CardContent className="flex flex-col items-center p-4">
                       <Code size={24} className="mb-2 text-muted-foreground" />
                       <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.projectsPosted}</Badge>
-                      <p className="text-sm text-muted-foreground mt-2">Projects Posted</p>
+                      <p className="text-sm text-muted-foreground mt-2">Projects Created</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-muted">
@@ -252,13 +254,6 @@ export default function ProfilePage() {
                       <GitPullRequest size={24} className="mb-2 text-muted-foreground" />
                       <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.projectsContributed}</Badge>
                       <p className="text-sm text-muted-foreground mt-2">Projects Contributed</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-muted">
-                    <CardContent className="flex flex-col items-center p-4">
-                      <GitMerge size={24} className="mb-2 text-muted-foreground" />
-                      <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.tagsCreated}</Badge>
-                      <p className="text-sm text-muted-foreground mt-2">Tags Created</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -284,7 +279,14 @@ export default function ProfilePage() {
                           githubUrl: '',
                           techStack: project.techStack,
                           imageUrl: null,
-                          users: project.users || [],
+                          users: [{
+                            user: {
+                              name: user.name,
+                              githubAvatarUrl: user.githubAvatarUrl || null,
+                              githubUsername: user.githubUsername || ''
+                            },
+                            role: 'OWNER'
+                          }],
                           language: project.techStack[0] || 'N/A'
                         }}
                         onClick={() => {
@@ -312,7 +314,14 @@ export default function ProfilePage() {
                           githubUrl: '',
                           techStack: project.techStack,
                           imageUrl: null,
-                          users: project.users || [],
+                          users: [{
+                            user: {
+                              name: user.name,
+                              githubAvatarUrl: user.githubAvatarUrl || null,
+                              githubUsername: user.githubUsername || ''
+                            },
+                            role: 'CONTRIBUTOR'
+                          }],
                           language: project.techStack[0] || 'N/A'
                         }}
                         onClick={() => {

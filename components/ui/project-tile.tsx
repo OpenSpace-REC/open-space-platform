@@ -26,7 +26,7 @@ interface Project {
 }
 
 interface ProjectTileProps {
-  project: Project;
+  project: Project | null;
   onClick?: () => void;
   isEditable?: boolean;
 }
@@ -43,16 +43,38 @@ const DISPLAY_LIMITS = {
 }
 
 export default function ProjectTile({ project, onClick, isEditable = false }: ProjectTileProps) {
-  const projectLink = project?.id ? `/project/${project.id}` : '/projects';
+  // Add validation for required fields
+  if (!project?.id || !project?.name) {
+    return (
+      <Card className="group h-full bg-zinc-900/90 border-zinc-800">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-xl font-semibold text-zinc-100">
+                Project Data Unavailable
+              </h3>
+              <p className="text-zinc-400 text-sm">
+                Unable to display project information.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const projectLink = `/project/${project.id}`;
 
   // Truncate long text with ellipsis
-  const truncateText = (text: string, limit: number) => {
+  const truncateText = (text: string | null | undefined, limit: number) => {
+    if (!text) return '';
     return text.length > limit ? `${text.substring(0, limit)}...` : text;
   }
 
-  // Get limited tech stack items
-  const displayedTechStack = project.techStack?.slice(0, DISPLAY_LIMITS.techStack);
-  const remainingTechCount = (project.techStack?.length || 0) - DISPLAY_LIMITS.techStack;
+  // Get limited tech stack items with null checks
+  const techStack = project.techStack || [];
+  const displayedTechStack = techStack.slice(0, DISPLAY_LIMITS.techStack);
+  const remainingTechCount = Math.max(0, techStack.length - DISPLAY_LIMITS.techStack);
 
   // Render different components based on isEditable
   if (isEditable) {

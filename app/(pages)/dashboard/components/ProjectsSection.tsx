@@ -7,33 +7,56 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Edit2 } from "lucide-react";
 import ProjectCard from '@/components/ui/project-tile';
-
-interface Project {
-  id: string;
-  name: string;
-  description: string | null;
-  githubUrl: string;
-  techStack: string[];
-  imageUrl: string | null;
-  users: {
-    user: {
-      name: string;
-      githubAvatarUrl: string | null;
-      githubUsername: string;
-    };
-    role: string;
-  }[];
-  language: string;
-  pullRequests: number;
-  stars: number;
-}
+import { type User } from '@/components/user-context';
 
 interface ProjectsSectionProps {
-  ownedProjects: Project[];
-  contributedProjects: Project[];
+  user: User;
 }
 
-export function ProjectsSection({ ownedProjects, contributedProjects }: ProjectsSectionProps) {
+export function ProjectsSection({ user }: ProjectsSectionProps) {
+  if (!user) return null;
+
+  // Transform projects data
+  const ownedProjects = (user.projects || [])
+    .filter(p => p.role === 'OWNER')
+    .map(p => ({
+      id: p.project.id,
+      name: p.project.name,
+      description: p.project.description,
+      githubUrl: p.project.githubUrl,
+      techStack: p.project.techStack,
+      imageUrl: p.project.imageUrl,
+      users: [{
+        user: {
+          name: user.name,
+          githubAvatarUrl: user.githubAvatarUrl || null,
+          githubUsername: user.githubUsername || ''
+        },
+        role: 'OWNER'
+      }],
+      language: p.project.techStack[0] || 'N/A'
+    }));
+
+  const contributedProjects = (user.projects || [])
+    .filter(p => p.role !== 'OWNER')
+    .map(p => ({
+      id: p.project.id,
+      name: p.project.name,
+      description: p.project.description,
+      githubUrl: p.project.githubUrl,
+      techStack: p.project.techStack,
+      imageUrl: p.project.imageUrl,
+      users: [{
+        user: {
+          name: user.name,
+          githubAvatarUrl: user.githubAvatarUrl || null,
+          githubUsername: user.githubUsername || ''
+        },
+        role: 'CONTRIBUTOR'
+      }],
+      language: p.project.techStack[0] || 'N/A'
+    }));
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
@@ -58,20 +81,9 @@ export function ProjectsSection({ ownedProjects, contributedProjects }: Projects
       </CardHeader>
       <CardContent className='p-2'>
         <Tabs defaultValue="recent" className="w-full">
-          {/* Fixes tab overflow */}
           <TabsList className="w-full h-full flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-            <TabsTrigger 
-              value="recent"
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
-            >
-              Recent Projects
-            </TabsTrigger>
-            <TabsTrigger 
-              value="contributed"
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
-            >
-              Contributed Projects
-            </TabsTrigger>
+            <TabsTrigger value="recent" className="flex-1">Recent Projects</TabsTrigger>
+            <TabsTrigger value="contributed" className="flex-1">Contributed Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="recent" className="mt-4 sm:mt-6">
             {ownedProjects.length === 0 ? (
@@ -85,9 +97,7 @@ export function ProjectsSection({ ownedProjects, contributedProjects }: Projects
                     <ProjectCard
                       project={project}
                       onClick={() => {
-                        if (project.id) {
-                          window.location.href = `/project/${project.id}`;
-                        }
+                        window.location.href = `/project/${project.id}`;
                       }}
                     />
                   </div>
@@ -98,7 +108,7 @@ export function ProjectsSection({ ownedProjects, contributedProjects }: Projects
           <TabsContent value="contributed" className="mt-4 sm:mt-6">
             {contributedProjects.length === 0 ? (
               <div className="text-center py-6 sm:py-8 text-muted-foreground">
-                <p>No projects found. Start by creating a new project!</p>
+                <p>No projects found. Start by contributing to a project!</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -107,9 +117,7 @@ export function ProjectsSection({ ownedProjects, contributedProjects }: Projects
                     <ProjectCard
                       project={project}
                       onClick={() => {
-                        if (project.id) {
-                          window.location.href = `/project/${project.id}`;
-                        }
+                        window.location.href = `/project/${project.id}`;
                       }}
                     />
                   </div>

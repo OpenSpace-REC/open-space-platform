@@ -400,7 +400,7 @@ export default function UploadProjectsPage() {
         </div>
       </Card>
 
-      <Tabs defaultValue="basic" className="w-full max-w-3xl mx-auto">
+      <Tabs defaultValue="basic" className="w-full mb-6">
         <TabsList className="flex items-center space-x-1 h-max flex-wrap bg-transparent w-full p-1 rounded-lg border">
           <TabsTrigger value="basic" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200 ease-in-out flex items-center space-x-2 px-3 py-2 rounded-md">
             <Info className="h-4 w-4" />
