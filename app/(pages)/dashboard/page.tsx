@@ -322,8 +322,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="grid gap-4">
+    <div className="container mx-auto p-4 min-w-0">
+      <div className="grid gap-4 min-w-0">
         <ProfileSection user={user} updateUser={updateUser} />
         {(user.role === 'CURATOR' || user.role === 'ADMIN') && (
           <CuratorTools user={user} />
@@ -334,8 +334,6 @@ export default function DashboardPage() {
         />
 
         <ProjectsSection user={user} />
-        
-        
       </div>
     </div>
   );

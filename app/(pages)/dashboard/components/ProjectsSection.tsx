@@ -59,40 +59,40 @@ export function ProjectsSection({ user }: ProjectsSectionProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 p-3 sm:p-4">
         <div>
-          <h2 className="text-lg font-semibold">Your Projects</h2>
-          <p className="text-sm text-muted-foreground">Manage and track your project contributions</p>
+          <h2 className="text-base sm:text-lg font-semibold">Your Projects</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage and track your project contributions</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Link href="/edit-projects" className="w-full sm:w-auto">
-            <Button variant="outline" className="w-full">
-              <Edit2 className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+              <Edit2 className="h-3 w-3 mr-1" />
               Edit Projects
             </Button>
           </Link>
           <Link href="/upload-project" className="w-full sm:w-auto">
-            <Button variant="default" className="w-full">
-              <Code className="h-4 w-4 mr-2" />
+            <Button variant="default" size="sm" className="w-full h-8 text-xs">
+              <Code className="h-3 w-3 mr-1" />
               Post New Project
             </Button>
           </Link>
         </div>
       </CardHeader>
-      <CardContent className='pb-6 pl-6 pr-6'>
+      <CardContent className='p-3 sm:p-4'>
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full h-full flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-            <TabsTrigger value="all" className="flex-1">All Projects</TabsTrigger>
-            <TabsTrigger value="posted" className="flex-1">Posted Projects</TabsTrigger>
-            <TabsTrigger value="contributed" className="flex-1">Contributed Projects</TabsTrigger>
+          <TabsList className="w-full flex items-center justify-start rounded-lg bg-muted p-0.5 text-muted-foreground text-xs">
+            <TabsTrigger value="all" className="flex-1 px-2 py-1">All Projects</TabsTrigger>
+            <TabsTrigger value="posted" className="flex-1 px-2 py-1">Posted</TabsTrigger>
+            <TabsTrigger value="contributed" className="flex-1 px-2 py-1">Contributed</TabsTrigger>
           </TabsList>
-          <TabsContent value="all" className="mt-4 sm:mt-6">
+          <TabsContent value="all" className="mt-3 sm:mt-4">
             {ownedProjects.length === 0 && contributedProjects.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground text-sm">
                 <p>No projects found. Start by creating or contributing to a project!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {[...ownedProjects, ...contributedProjects].map((project) => (
                   <div key={project.id} className="w-full">
                     <ProjectCard
@@ -106,13 +106,13 @@ export function ProjectsSection({ user }: ProjectsSectionProps) {
               </div>
             )}
           </TabsContent>
-          <TabsContent value="posted" className="mt-4 sm:mt-6">
+          <TabsContent value="posted" className="mt-3 sm:mt-4">
             {ownedProjects.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground text-sm">
                 <p>No projects found. Start by creating a new project!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {ownedProjects.map((project) => (
                   <div key={project.id} className="w-full">
                     <ProjectCard
@@ -126,13 +126,13 @@ export function ProjectsSection({ user }: ProjectsSectionProps) {
               </div>
             )}
           </TabsContent>
-          <TabsContent value="contributed" className="mt-4 sm:mt-6">
+          <TabsContent value="contributed" className="mt-3 sm:mt-4">
             {contributedProjects.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground text-sm">
                 <p>No projects found. Start by contributing to a project!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {contributedProjects.map((project) => (
                   <div key={project.id} className="w-full">
                     <ProjectCard

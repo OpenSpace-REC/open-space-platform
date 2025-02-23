@@ -28,18 +28,18 @@ export function ActivityOverview({ projects = [], points = 0 }: ActivityOverview
 
   return (
     <Card className="w-full mb-4 sm:mb-6 bg-card">
-      <CardHeader className="space-y-1">
+      <CardHeader className="space-y-1 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">Activity Overview</h2>
         <p className="text-sm text-muted-foreground">Track your project contributions and activity</p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-4 sm:px-6">
         <Card className="bg-muted p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Activity size={18} className="text-muted-foreground" />
+              <Activity size={18} className="text-muted-foreground flex-shrink-0" />
               <span className="font-medium">Contribution Points</span>
             </div>
-            <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+            <Badge variant="secondary" className="bg-secondary text-secondary-foreground w-fit">
               {points} points
             </Badge>
           </div>
@@ -50,7 +50,7 @@ export function ActivityOverview({ projects = [], points = 0 }: ActivityOverview
           <Card className="bg-muted">
             <CardContent className="flex flex-col items-center p-4">
               <Code size={24} className="mb-2 text-muted-foreground" />
-              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">
+              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground px-3 py-1">
                 {ownedProjects.length}
               </Badge>
               <p className="text-sm text-muted-foreground mt-2">Projects Created</p>
@@ -59,7 +59,7 @@ export function ActivityOverview({ projects = [], points = 0 }: ActivityOverview
           <Card className="bg-muted">
             <CardContent className="flex flex-col items-center p-4">
               <GitPullRequest size={24} className="mb-2 text-muted-foreground" />
-              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">
+              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground px-3 py-1">
                 {contributedProjects.length}
               </Badge>
               <p className="text-sm text-muted-foreground mt-2">Projects Contributed</p>
