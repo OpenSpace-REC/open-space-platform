@@ -79,13 +79,34 @@ export function ProjectsSection({ user }: ProjectsSectionProps) {
           </Link>
         </div>
       </CardHeader>
-      <CardContent className='p-2'>
-        <Tabs defaultValue="recent" className="w-full">
+      <CardContent className='pb-6 pl-6 pr-6'>
+        <Tabs defaultValue="all" className="w-full">
           <TabsList className="w-full h-full flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-            <TabsTrigger value="recent" className="flex-1">Recent Projects</TabsTrigger>
+            <TabsTrigger value="all" className="flex-1">All Projects</TabsTrigger>
+            <TabsTrigger value="posted" className="flex-1">Posted Projects</TabsTrigger>
             <TabsTrigger value="contributed" className="flex-1">Contributed Projects</TabsTrigger>
           </TabsList>
-          <TabsContent value="recent" className="mt-4 sm:mt-6">
+          <TabsContent value="all" className="mt-4 sm:mt-6">
+            {ownedProjects.length === 0 && contributedProjects.length === 0 ? (
+              <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                <p>No projects found. Start by creating or contributing to a project!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                {[...ownedProjects, ...contributedProjects].map((project) => (
+                  <div key={project.id} className="w-full">
+                    <ProjectCard
+                      project={project}
+                      onClick={() => {
+                        window.location.href = `/project/${project.id}`;
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="posted" className="mt-4 sm:mt-6">
             {ownedProjects.length === 0 ? (
               <div className="text-center py-6 sm:py-8 text-muted-foreground">
                 <p>No projects found. Start by creating a new project!</p>

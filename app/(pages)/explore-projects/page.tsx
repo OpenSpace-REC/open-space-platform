@@ -42,6 +42,7 @@ interface Project {
   stars: number;
   department: string;
   club: string;
+  createdAt: string;
 }
 
 interface FilterOptions {
@@ -57,16 +58,12 @@ let isDataFetched = false;
 const MemoizedProjectsGrid = memo(ProjectsGrid);
 
 const RecentProjectsSection = memo(({ projects, onProjectClick }: { projects: Project[], onProjectClick: (id: string) => void }) => {
-  const router = useRouter();
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center mb-4">
         <h2 className="text-2xl font-semibold flex items-center">
-          <GitPullRequest className="mr-2" /> Recent Activity
+          <GitPullRequest className="mr-2" /> Recent Projects
         </h2>
-        <Button variant="ghost" onClick={() => router.push('/projects/activity')}>
-          View All <ArrowRight className="ml-2" size={16} />
-        </Button>
       </div>
       <MemoizedProjectsGrid
         projects={projects}
@@ -241,7 +238,7 @@ export default function ExploreProjectsPage() {
 
   const recentProjects = useMemo(() => {
     return [...projects]
-      .sort((a, b) => b.pullRequests - a.pullRequests)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 3);
   }, [projects]);
 
