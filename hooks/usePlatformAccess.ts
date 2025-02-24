@@ -23,7 +23,7 @@ export function usePlatformAccess() {
                 setIsAdminOnly(data.adminOnlyAccess);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
-                // Default to non-admin-only mode in case of error to prevent lockout
+
                 setIsAdminOnly(false);
             } finally {
                 setIsLoading(false);
@@ -33,9 +33,6 @@ export function usePlatformAccess() {
         checkPlatformAccess();
     }, [user]);
 
-    // Consider user as having access if:
-    // 1. Platform is not in admin-only mode, OR
-    // 2. User is an admin
     const hasAccess = !isLoading && (!isAdminOnly || user?.role === 'ADMIN');
 
     return { isAdminOnly, isLoading, error, hasAccess };
