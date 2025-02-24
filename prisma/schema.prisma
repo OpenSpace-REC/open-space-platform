@@ -22,6 +22,7 @@ model User {
   githubAccessToken String?
   points            Int           @default(0)
   techStack         String[]      @default([])
+  banned            Boolean       @default(false)
   projectTags       ProjectTag[]
   projects          ProjectUser[]
 }
@@ -137,6 +138,13 @@ model VotingStatus {
   startTime DateTime?
   endTime   DateTime?
   updatedAt DateTime  @updatedAt
+}
+
+model Settings {
+  id                 String   @id @default("app_settings")
+  leaderboardEnabled Boolean  @default(true)
+  lastModified       DateTime @default(now()) @updatedAt
+  adminOnlyAccess    Boolean  @default(false)
 }
 
 enum UserRole {

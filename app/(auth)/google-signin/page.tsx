@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation"; 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FaGoogle } from "react-icons/fa";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { signOut as signOutAuth } from 'next-auth/react';
 import { Input } from "@/components/ui/input";
 import SignIn from "@/components/auth/sign-in";
 import SignOut from "@/components/auth/sign-out";
@@ -25,6 +26,27 @@ export default function SignUpPage() {
         if (!session?.user?.email || hasCheckedAccess) return;
         
         try {
+            // First check if user is banned
+            const banCheckResponse = await fetch('/api/check-ban-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: session.user.email
+                }),
+            });
+
+            if (!banCheckResponse.ok) {
+                const data = await banCheckResponse.json();
+                if (data.error === 'User is banned') {
+                    await signOutAuth();
+                    window.location.href = '/banned';
+                    return;
+                }
+            }
+
+            // Then check if email is allowed
             const response = await fetch('/api/check-access', {
                 method: 'POST',
                 headers: {
@@ -52,19 +74,14 @@ export default function SignUpPage() {
                     variant: "destructive",
                     duration: 5000,
                 });
-                setTimeout(() => {
-                    signOut({ 
-                        callbackUrl: '/',
-                        redirect: true 
-                    });
-                }, 2000);
+                await signOutAuth();
+                window.location.href = '/';
             }
         } catch (error) {
-            console.error("Error checking access:", error);
-            setHasCheckedAccess(true);
+            console.error('Error checking access:', error);
             toast({
                 title: "Error",
-                description: "Something went wrong while checking access.",
+                description: "An error occurred while checking access.",
                 variant: "destructive",
                 duration: 5000,
             });

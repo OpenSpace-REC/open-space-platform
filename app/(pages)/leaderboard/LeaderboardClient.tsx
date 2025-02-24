@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useLeaderboard } from "@/hooks/useLeaderboard"
 
 type User = {
   id: string
@@ -15,10 +17,17 @@ type User = {
 }
 
 export default function LeaderboardClient() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { isEnabled, isLoading: isCheckingAccess } = useLeaderboard();
 
   useEffect(() => {
+    if (!isCheckingAccess && !isEnabled) {
+      router.push('/');
+      return;
+    }
+
     async function fetchLeaderboardData() {
       try {
         const response = await fetch('/api/leaderboard');
@@ -32,8 +41,28 @@ export default function LeaderboardClient() {
       }
     }
 
-    fetchLeaderboardData();
-  }, []);
+    if (isEnabled) {
+      fetchLeaderboardData();
+    }
+  }, [isEnabled, isCheckingAccess, router]);
+
+  if (isCheckingAccess || (!isEnabled && isLoading)) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              Loading...
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isEnabled) {
+    return null; // This will prevent any flash of content before redirect
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -99,4 +128,4 @@ export default function LeaderboardClient() {
       </Card>
     </div>
   );
-} 
+}

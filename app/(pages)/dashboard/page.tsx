@@ -24,7 +24,9 @@ import { CuratorTools } from './components/CuratorTools';
 import { ActivityOverview } from './components/ActivityOverview';
 import { ProjectsSection } from './components/ProjectsSection';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import DashboardLoading from './loading';
+import { usePlatformAccess } from '@/hooks/usePlatformAccess';
 
 interface ProjectUser {
   user: {
@@ -92,9 +94,12 @@ const statusOptions = [
 
 export default function DashboardPage() {
   const { user, updateUser, isLoading } = useUser();
+  const { hasAccess, isLoading: accessLoading } = usePlatformAccess();
   const router = useRouter();
   const statusOptions: StatusType[] = ['DRAFT', 'IN_PROGRESS', 'COMPLETED'];
   const [projectIds, setProjectIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<EditableProfileData | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isCreatingTag, setIsCreatingTag] = useState(false);
@@ -142,11 +147,48 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  if (isLoading) {
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      if (!user?.email) return;
+
+      try {
+        const response = await fetch('/api/check-ban-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: user.email }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.error === 'User is banned') {
+            await signOut();
+            window.location.href = '/banned';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking ban status:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkBanStatus();
+  }, [user?.email]);
+
+  useEffect(() => {
+    if (!accessLoading && !hasAccess) {
+      router.push("/restricted");
+    }
+  }, [hasAccess, accessLoading, router]);
+
+  if (isLoading || accessLoading || loading) {
     return <DashboardLoading />;
   }
 
-  if (!user) {
+  if (!user || !hasAccess) {
     return null;
   }
 
