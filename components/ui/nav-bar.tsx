@@ -194,12 +194,17 @@ export default function Navbar() {
                               Explore Projects
                             </Button>
                           </Link>
+                          <Link onClick={() => setSheetState(prev => !prev)} href="/get-started" className="w-full h-[50px]">
+                            <Button variant="ghost" className="w-full justify-start text-base">
+                              Get Started
+                            </Button>
+                          </Link>
                         </nav>
                       </div>
                     </div>
 
                     <div className="border-t border-border p-4 flex items-center justify-between w-full">
-                      <Link href="/profile" className="w-[44px] h-[44px] bg-gray-50/10 rounded-full text-base flex items-center justify-center">
+                      <Link href={`/profile/${user?.githubUsername}`} className="w-[44px] h-[44px] bg-gray-50/10 rounded-full text-base flex items-center justify-center">
                         <Button variant="ghost" className="w-full h-full justify-start text-base p-3">
                           <UserIcon className="h-[40px] w-[40px] block scale-95" />
                         </Button>

@@ -84,7 +84,7 @@ const FeaturesShowcase = () => {
           icon: Share2
         }
       ],
-      link: "/upload-projects"
+      link: "/upload-project"
     },
     {
       title: "Open Source Exploration",
@@ -119,13 +119,13 @@ const FeaturesShowcase = () => {
   const highlightFeatures = [];
 
   const MainIcon = ({ icon: Icon }: { icon: LucideIcon }) => (
-    <div className="inline-block p-3 rounded-2xl bg-white/5 mb-4">
-      <Icon className="w-8 h-8 text-white" />
+    <div className="inline-block p-3 rounded-2xl bg-foreground/5 mb-4">
+      <Icon className="w-8 h-8 text-foreground" />
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full bg-black overflow-hidden">
+    <div className="min-h-screen w-full bg-background/50 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <motion.div 
@@ -134,23 +134,25 @@ const FeaturesShowcase = () => {
           transition={{ duration: 0.8 }}
           className="text-center py-20 relative px-4"
         >
-          <div className="absolute inset-0 bg-white/5 blur-3xl" />
-          <h1 className="text-6xl font-bold mb-6 text-white">
-            Welcome to Open Space Platform
-          </h1>
-          <p className="text-xl text-gray-300 mb-6 max-w-2xl mx-auto">
-            Your Gateway to Project Excellence and Open Source Innovation
-          </p>
-          <div className="flex gap-3 justify-center mb-8 flex-wrap">
-            {['Portfolio', 'Open Source', 'Recognition', 'Verification'].map((tag, i) => (
-              <Badge 
-                key={tag}
-                variant="secondary" 
-                className="text-sm bg-white/10 hover:bg-white/20 transition-colors"
-              >
-                {tag}
-              </Badge>
-            ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background/50" />
+          <div className="relative z-10">
+            <h1 className="text-6xl font-bold mb-6 text-foreground">
+              Welcome to Open Space Platform
+            </h1>
+            <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Your Gateway to Project Excellence and Open Source Innovation
+            </p>
+            <div className="flex gap-3 justify-center mb-8 flex-wrap">
+              {['Portfolio', 'Open Source', 'Recognition', 'Verification'].map((tag, i) => (
+                <Badge 
+                  key={tag}
+                  variant="secondary" 
+                  className="text-sm"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
           </div>
         </motion.div>
 
@@ -164,12 +166,12 @@ const FeaturesShowcase = () => {
           >
             <div className="text-center mb-12">
               <MainIcon icon={mainFeatures[0].icon} />
-              <h2 className="text-3xl font-bold text-white mb-3">{mainFeatures[0].title}</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">{mainFeatures[0].description}</p>
+              <h2 className="text-3xl font-bold text-foreground mb-3">{mainFeatures[0].title}</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">{mainFeatures[0].description}</p>
             </div>
             
             <div className="relative">
-              <div className="absolute top-0 left-1/2 h-full w-px bg-white/10" />
+              <div className="absolute top-0 left-1/2 h-full w-px bg-foreground/10" />
               <div className="space-y-12">
                 {mainFeatures[0]?.steps?.map((step, idx) => (
                   <motion.div
@@ -180,14 +182,14 @@ const FeaturesShowcase = () => {
                     className={`flex items-center gap-8 ${idx % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
                   >
                     <div className={`flex-1 ${idx % 2 === 0 ? 'text-right' : 'text-left'}`}>
-                      <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
-                      <p className="text-gray-400">{step.description}</p>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">{step.title}</h3>
+                      <p className="text-muted-foreground">{step.description}</p>
                     </div>
                     <div className="relative">
-                      <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center relative z-10">
-                        {React.createElement(step.icon, { className: "w-8 h-8 text-white" })}
+                      <div className="w-16 h-16 rounded-full bg-foreground/10 flex items-center justify-center relative z-10">
+                        {React.createElement(step.icon, { className: "w-8 h-8 text-foreground" })}
                       </div>
-                      <div className="absolute top-1/2 -translate-y-1/2 w-8 h-px bg-white/10" />
+                      <div className="absolute top-1/2 -translate-y-1/2 w-8 h-px bg-foreground/10" />
                     </div>
                     <div className="flex-1" />
                   </motion.div>
@@ -199,7 +201,7 @@ const FeaturesShowcase = () => {
               <Link href={mainFeatures[0].link}>
                 <Button 
                   size="lg"
-                  className="bg-white/10 hover:bg-white/20 text-white border-0"
+                  className="bg-foreground/10 hover:bg-foreground/20 text-foreground border-0"
                 >
                   Create Your Portfolio
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -216,12 +218,12 @@ const FeaturesShowcase = () => {
           >
             <div className="text-center mb-16">
               <MainIcon icon={Rocket} />
-              <h2 className="text-3xl font-bold text-white mb-3">Start Your Open Source Journey</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Follow these simple steps to begin contributing and earning recognition</p>
+              <h2 className="text-3xl font-bold text-foreground mb-3">Start Your Open Source Journey</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Follow these simple steps to begin contributing and earning recognition</p>
             </div>
 
             <div className="relative">
-              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-white/10 md:-translate-x-1/2 hidden sm:block" />
+              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-foreground/10 md:-translate-x-1/2 hidden sm:block" />
               {[
                 {
                   title: "Sign In & Connect",
@@ -255,23 +257,23 @@ const FeaturesShowcase = () => {
                     idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
                   }`}>
                     <div className={`w-full md:w-1/2 ${idx % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-center`}>
-                      <Card className="inline-block bg-white/5 border-white/10 w-full md:w-auto">
+                      <Card className="inline-block bg-foreground/5 border-foreground/10 w-full md:w-auto">
                         <CardContent className="p-6">
                           <div className={`flex flex-col md:flex-row items-center gap-4 ${
                             idx % 2 === 0 ? 'md:flex-row-reverse' : 'md:flex-row'
                           }`}>
-                            <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                              {React.createElement(step.icon, { className: "w-6 h-6 text-white" })}
+                            <div className="w-12 h-12 rounded-lg bg-foreground/10 flex items-center justify-center flex-shrink-0">
+                              {React.createElement(step.icon, { className: "w-6 h-6 text-foreground" })}
                             </div>
                             <div>
-                              <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
-                              <p className="text-gray-400 text-sm">{step.description}</p>
+                              <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
+                              <p className="text-muted-foreground text-sm">{step.description}</p>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     </div>
-                    <div className="w-4 h-4 bg-white/20 rounded-full absolute left-4 md:left-1/2 md:-translate-x-1/2 hidden sm:block" 
+                    <div className="w-4 h-4 bg-foreground/20 rounded-full absolute left-4 md:left-1/2 md:-translate-x-1/2 hidden sm:block" 
                       style={{ top: '50%', transform: 'translateY(-50%)' }} />
                   </div>
                 </motion.div>
@@ -287,8 +289,8 @@ const FeaturesShowcase = () => {
           >
             <div className="text-center mb-16">
               <MainIcon icon={BarChart3} />
-              <h2 className="text-3xl font-bold text-white mb-3">Automatic Profile Updates</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Your Open Space profile automatically tracks and showcases all your contributions</p>
+              <h2 className="text-3xl font-bold text-foreground mb-3">Automatic Profile Updates</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Your Open Space profile automatically tracks and showcases all your contributions</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -315,14 +317,14 @@ const FeaturesShowcase = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300">
+                  <Card className="bg-foreground/5 border-foreground/10 hover:bg-foreground/10 transition-all duration-300">
                     <CardContent className="p-6">
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
-                          {React.createElement(feature.icon, { className: "w-8 h-8 text-white" })}
+                        <div className="w-16 h-16 rounded-2xl bg-foreground/10 flex items-center justify-center mb-4">
+                          {React.createElement(feature.icon, { className: "w-8 h-8 text-foreground" })}
                         </div>
-                        <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                        <p className="text-gray-400 text-sm">{feature.description}</p>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                        <p className="text-muted-foreground text-sm">{feature.description}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -339,31 +341,31 @@ const FeaturesShowcase = () => {
           >
             <div className="text-center mb-16">
               <MainIcon icon={Award} />
-              <h2 className="text-3xl font-bold text-white mb-3">Official Achievement Tags</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">Your projects receive verified recognition directly from event organizers</p>
+              <h2 className="text-3xl font-bold text-foreground mb-3">Official Achievement Tags</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Your projects receive verified recognition directly from event organizers</p>
             </div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-white/5 blur-3xl -z-10" />
-              <Card className="bg-white/5 border-white/10">
+              <div className="absolute inset-0 bg-foreground/5 blur-3xl -z-10" />
+              <Card className="bg-foreground/5 border-foreground/10">
                 <CardContent className="p-4 md:p-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Achievement Types */}
                     <div className="space-y-6 relative pb-8 md:pb-0">
                       <div className="absolute top-0 right-4">
-                        <CheckCircle2 className="w-6 h-6 text-white" />
+                        <CheckCircle2 className="w-6 h-6 text-foreground" />
                       </div>
-                      <h3 className="text-xl font-semibold text-white">Achievement Types</h3>
+                      <h3 className="text-xl font-semibold text-foreground">Achievement Types</h3>
                       <div className="space-y-4">
-                        <Badge className="bg-white/10 text-white hover:bg-white/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
+                        <Badge className="bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
                           <Trophy className="w-4 h-4" />
                           Hackathon Wins
                         </Badge>
-                        <Badge className="bg-white/10 text-white hover:bg-white/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
+                        <Badge className="bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
                           <Medal className="w-4 h-4" />
                           Competition Awards
                         </Badge>
-                        <Badge className="bg-white/10 text-white hover:bg-white/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
+                        <Badge className="bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors px-4 py-2 text-sm flex items-center gap-2 w-full justify-center md:justify-start">
                           <Star className="w-4 h-4" />
                           Event Recognition
                         </Badge>
@@ -371,19 +373,19 @@ const FeaturesShowcase = () => {
                     </div>
 
                     {/* Verification Process */}
-                    <div className="space-y-6 md:border-l md:border-r border-white/10 md:px-8 border-t border-b md:border-t-0 md:border-b-0 py-8 md:py-0">
-                      <h3 className="text-xl font-semibold text-white text-center md:text-left">Verification Process</h3>
+                    <div className="space-y-6 md:border-l md:border-r border-foreground/10 md:px-8 border-t border-b md:border-t-0 md:border-b-0 py-8 md:py-0">
+                      <h3 className="text-xl font-semibold text-foreground text-center md:text-left">Verification Process</h3>
                       <div className="space-y-6">
-                        <div className="flex items-center gap-4 text-gray-300">
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">1</div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
+                          <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center text-sm font-medium text-foreground">1</div>
                           <p className="flex-1">Upload your project and achievements</p>
                         </div>
-                        <div className="flex items-center gap-4 text-gray-300">
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">2</div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
+                          <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center text-sm font-medium text-foreground">2</div>
                           <p className="flex-1">Organizers review and verify claims</p>
                         </div>
-                        <div className="flex items-center gap-4 text-gray-300">
-                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">3</div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
+                          <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center text-sm font-medium text-foreground">3</div>
                           <p className="flex-1">Receive official verification badges</p>
                         </div>
                       </div>
@@ -391,25 +393,25 @@ const FeaturesShowcase = () => {
 
                     {/* Benefits */}
                     <div className="space-y-6 pt-8 md:pt-0">
-                      <h3 className="text-xl font-semibold text-white text-center md:text-left">Benefits</h3>
+                      <h3 className="text-xl font-semibold text-foreground text-center md:text-left">Benefits</h3>
                       <div className="space-y-4">
                         <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center flex-shrink-0">
-                            <CheckCircle2 className="w-4 h-4 text-white" />
+                          <div className="w-6 h-6 rounded bg-foreground/10 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle2 className="w-4 h-4 text-foreground" />
                           </div>
-                          <p className="text-gray-300 text-sm flex-1">Official proof of participation and achievements</p>
+                          <p className="text-muted-foreground text-sm flex-1">Official proof of participation and achievements</p>
                         </div>
                         <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center flex-shrink-0">
-                            <CheckCircle2 className="w-4 h-4 text-white" />
+                          <div className="w-6 h-6 rounded bg-foreground/10 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle2 className="w-4 h-4 text-foreground" />
                           </div>
-                          <p className="text-gray-300 text-sm flex-1">Enhanced visibility in the platform</p>
+                          <p className="text-muted-foreground text-sm flex-1">Enhanced visibility in the platform</p>
                         </div>
                         <div className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center flex-shrink-0">
-                            <CheckCircle2 className="w-4 h-4 text-white" />
+                          <div className="w-6 h-6 rounded bg-foreground/10 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle2 className="w-4 h-4 text-foreground" />
                           </div>
-                          <p className="text-gray-300 text-sm flex-1">Permanent record of your accomplishments</p>
+                          <p className="text-muted-foreground text-sm flex-1">Permanent record of your accomplishments</p>
                         </div>
                       </div>
                     </div>
@@ -422,16 +424,16 @@ const FeaturesShowcase = () => {
           {/* CTA Section */}
           <div className="mt-32 py-16 px-4">
             <div className="max-w-2xl mx-auto text-center">
-              <h2 className="text-4xl font-bold text-white mb-6">
+              <h2 className="text-4xl font-bold text-foreground mb-6">
                 Ready to Showcase Your Projects?
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-muted-foreground mb-8">
                 Join the community of innovative developers and start building your portfolio today
               </p>
               <div className="inline-block">
                 <Link 
-                  href="/upload-projects"
-                  className="inline-flex items-center px-8 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-lg font-medium transition-all duration-200"
+                  href="/dashboard"
+                  className="inline-flex items-center px-8 py-3 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-lg font-medium transition-all duration-200"
                 >
                   <Rocket className="w-6 h-6 mr-3" />
                   Get Started Now
