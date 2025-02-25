@@ -137,7 +137,7 @@ export const ProfileSection = memo(function ProfileSection({ user, updateUser }:
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
-          <div className="text-center sm:text-left flex-grow space-y-3">
+          <div className="text-center sm:text-left flex-grow space-y-2">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
               <h1 className="text-xl sm:text-2xl font-bold">{user.name}</h1>
               <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
@@ -217,10 +217,11 @@ export const ProfileSection = memo(function ProfileSection({ user, updateUser }:
               </div>
             </div>
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                Rank: {user.rank || 'Beginner'}
-              </Badge>
-              <Badge variant="outline" className="border-accent text-accent-foreground">Active</Badge>
+              {user.rank && (user.rank === 'admin' || user.rank === 'curator') && (
+                <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                  {user.rank}
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">{user.bio || "No bio available"}</p>
           </div>
