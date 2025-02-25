@@ -60,6 +60,21 @@ export default function Navbar() {
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
+      <NavigationMenuItem>
+        <Link href="/get-started" legacyBehavior passHref>
+          <NavigationMenuLink>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-white/10  rounded-full transition-all " />
+              <Button 
+                variant="ghost"
+                className="relative px-4 py-2 text-sm font-medium text-white border border-white/20 rounded-full  transition-all duration-300 "
+              >
+                Get Started
+              </Button>
+            </div>
+          </NavigationMenuLink>
+        </Link>
+      </NavigationMenuItem>
     </>
   );
 
@@ -75,9 +90,9 @@ export default function Navbar() {
         {session ? (
           <>
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-6">
               <NavigationMenu>
-                <NavigationMenuList className="flex space-x-4">
+                <NavigationMenuList className="flex items-center space-x-4">
                   <NavItems />
                 </NavigationMenuList>
               </NavigationMenu>

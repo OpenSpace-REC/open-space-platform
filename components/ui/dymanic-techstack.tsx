@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
 interface TechStackSelectorProps {
-    project: { techStack: string };
+    project: { techStack: string[] };
     addTechStack: (tech: string) => void;
     removeTech: (tech: string) => void;
 }
@@ -17,6 +17,8 @@ interface Technology {
     value: string;
     label: string;
 }
+
+
 
 const TechStackSelector: React.FC<TechStackSelectorProps> = ({ project, addTechStack, removeTech }) => {
     const [technologies, setTechnologies] = useState<Technology[]>([]);
@@ -50,21 +52,19 @@ const TechStackSelector: React.FC<TechStackSelectorProps> = ({ project, addTechS
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap gap-2 mb-2">
-                {(project.techStack || "").split(",").map((tech, index) =>
-                    tech.trim() ? (
-                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                            {tech.trim()}
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-4 w-4 p-0 hover:bg-transparent"
-                                onClick={() => removeTech(tech.trim())}
-                            >
-                                <X className="h-3 w-3" />
-                            </Button>
-                        </Badge>
-                    ) : null
-                )}
+                {(project.techStack || []).map((tech, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        {tech}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 hover:bg-transparent"
+                            onClick={() => removeTech(tech)}
+                        >
+                            <X className="h-3 w-3" />
+                        </Button>
+                    </Badge>
+                ))}
             </div>
 
             <Select onValueChange={(value) => addTechStack(value)}>

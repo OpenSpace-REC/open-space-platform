@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, memo } from 'react';
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit3, Mail, Github, Calendar, Share2 } from "lucide-react";
@@ -32,7 +32,7 @@ interface ProfileSectionProps {
 interface EditableProfileData {
   name: string;
   bio: string | null;
-  techStack: string;
+  techStack: string[];
 }
 
 interface ValidationErrors {
@@ -40,22 +40,14 @@ interface ValidationErrors {
   bio?: string;
 }
 
-export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
+export const ProfileSection = memo(function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<EditableProfileData>({
     name: user.name,
     bio: user.bio,
-    techStack: user.techStack?.join(',') || ''
+    techStack: user.techStack || []
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
-
-  useEffect(() => {
-    setEditableData({
-      name: user.name,
-      bio: user.bio,
-      techStack: user.techStack?.join(',') || ''
-    });
-  }, [user]);
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -81,7 +73,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
         body: JSON.stringify({
           name: editableData.name.trim(),
           bio: editableData.bio?.trim() || null,
-          techStack: editableData.techStack.split(',').filter(tech => tech.trim()),
+          techStack: editableData.techStack,
         }),
       });
 
@@ -102,7 +94,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
       setEditableData({
         name: user.name,
         bio: user.bio,
-        techStack: user.techStack?.join(',') || ''
+        techStack: user.techStack || []
       });
       setErrors({});
     }
@@ -120,11 +112,11 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   };
 
   const addTechStack = (tech: string) => {
-    const currentTechs = editableData.techStack.split(',').filter(t => t.trim());
+    const currentTechs = editableData.techStack;
     if (!currentTechs.includes(tech)) {
       setEditableData(prev => ({
         ...prev,
-        techStack: [...currentTechs, tech].join(',')
+        techStack: [...currentTechs, tech]
       }));
     }
   };
@@ -132,10 +124,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   const removeTech = (techToRemove: string) => {
     setEditableData(prev => ({
       ...prev,
-      techStack: prev.techStack
-        .split(',')
-        .filter(tech => tech.trim() !== techToRemove)
-        .join(',')
+      techStack: prev.techStack.filter(tech => tech !== techToRemove)
     }));
   };
 
@@ -280,4 +269,10 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
       </CardHeader>
     </Card>
   );
-} 
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.user?.name === nextProps.user?.name &&
+    prevProps.user?.bio === nextProps.user?.bio &&
+    prevProps.user?.email === nextProps.user?.email
+  );
+});
