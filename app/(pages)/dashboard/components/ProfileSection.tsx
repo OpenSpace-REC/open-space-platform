@@ -191,7 +191,7 @@ export const ProfileSection = memo(function ProfileSection({ user, updateUser }:
                       <div className="space-y-2">
                         <Label>Tech Stack</Label>
                         <TechStackSelector
-                          project={{ techStack: editableData.techStack }}
+                          techStack={editableData.techStack.join(', ')}
                           addTechStack={addTechStack}
                           removeTech={removeTech}
                         />

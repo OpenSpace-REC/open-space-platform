@@ -64,10 +64,10 @@ export default function Navbar() {
         <Link href="/get-started" legacyBehavior passHref>
           <NavigationMenuLink>
             <div className="relative group">
-              <div className="absolute inset-0 bg-white/10  rounded-full transition-all " />
+              <div className="absolute inset-0 dark:bg-white/10 bg-primary/10 rounded-full transition-all" />
               <Button 
                 variant="ghost"
-                className="relative px-4 py-2 text-sm font-medium text-white border border-white/20 rounded-full  transition-all duration-300 "
+                className="relative px-4 py-2 text-sm font-medium dark:text-white text-primary border dark:border-white/20 border-primary/20 rounded-full transition-all duration-300 hover:bg-primary/10 dark:hover:bg-white/10"
               >
                 Get Started
               </Button>

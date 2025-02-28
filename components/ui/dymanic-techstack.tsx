@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
 interface TechStackSelectorProps {
-    project: { techStack: string[] };
+    techStack: string;
     addTechStack: (tech: string) => void;
     removeTech: (tech: string) => void;
 }
@@ -18,9 +18,7 @@ interface Technology {
     label: string;
 }
 
-
-
-const TechStackSelector: React.FC<TechStackSelectorProps> = ({ project, addTechStack, removeTech }) => {
+const TechStackSelector: React.FC<TechStackSelectorProps> = ({ techStack, addTechStack, removeTech }) => {
     const [technologies, setTechnologies] = useState<Technology[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -49,10 +47,12 @@ const TechStackSelector: React.FC<TechStackSelectorProps> = ({ project, addTechS
         fetchTechnologies();
     }, []);
 
+    const techStackArray = techStack.split(',').map(tech => tech.trim()).filter(Boolean);
+
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap gap-2 mb-2">
-                {(project.techStack || []).map((tech, index) => (
+                {techStackArray.map((tech, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         {tech}
                         <Button
@@ -88,7 +88,6 @@ const TechStackSelector: React.FC<TechStackSelectorProps> = ({ project, addTechS
                         </SelectItem>
                     )}
                 </SelectContent>
-
             </Select>
         </div>
     );

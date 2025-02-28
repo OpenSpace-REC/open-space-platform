@@ -88,7 +88,7 @@ export function ProjectDetails({
         <div className="space-y-2">
           <Label>Tech Stack</Label>
           <TechStackSelector 
-            project={{ techStack: Array.isArray(project.techStack) ? project.techStack : [] }}
+            techStack={project.techStack}
             addTechStack={addTechStack}
             removeTech={removeTech}
           />
@@ -96,4 +96,4 @@ export function ProjectDetails({
       </CardContent>
     </Card>
   )
-} 
+}
