@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { Resource } from '@/app/types/project';
 
+const POINTS_FOR_PROJECT_WITH_GITHUB = 20;
+
 async function getNextProjectId() {
   const year = new Date().getFullYear();
   const counter = await prisma.counter.upsert({
@@ -11,6 +13,17 @@ async function getNextProjectId() {
     create: { id: 'project_counter', count: 1 },
   });
   return `${year}-${String(counter.count).padStart(4, '0')}`;
+}
+
+async function awardPointsForGithubProject(userId: string) {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      points: {
+        increment: POINTS_FOR_PROJECT_WITH_GITHUB
+      }
+    },
+  });
 }
 
 export async function POST(request: Request) {
@@ -129,6 +142,10 @@ export async function POST(request: Request) {
         resources: true,
       },
     });
+
+    if (githubUrl && ownerId) {
+      await awardPointsForGithubProject(ownerId);
+    }
 
     return NextResponse.json(project);
   } catch (error) {

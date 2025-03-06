@@ -31,7 +31,15 @@ export async function GET() {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    const ownedProjects = user.projects.filter(p => p.role === 'OWNER');
+    const contributedProjects = user.projects.filter(p => p.role !== 'OWNER');
+
+    return NextResponse.json({
+        ...user,
+        ownedProjects,
+        contributedProjects,
+        points: user.points || 0
+    });
 }
 
 export async function PATCH(req: NextRequest) {

@@ -24,12 +24,14 @@ interface TagFormData {
 }
 
 interface CuratorToolsProps {
-  hasTaggingPermissions: boolean;
+  user: {
+    role: string;
+  };
 }
 
 const statusOptions: StatusType[] = ['DRAFT', 'IN_PROGRESS', 'COMPLETED'];
 
-export function CuratorTools({ hasTaggingPermissions }: CuratorToolsProps) {
+export function CuratorTools({ user }: CuratorToolsProps) {
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [projectIds, setProjectIds] = useState<string[]>([]);
   const [tagFormData, setTagFormData] = useState<TagFormData>({
@@ -113,7 +115,7 @@ export function CuratorTools({ hasTaggingPermissions }: CuratorToolsProps) {
     }
   };
 
-  if (!hasTaggingPermissions) return null;
+  if (!user || (user.role !== 'CURATOR' && user.role !== 'ADMIN')) return null;
 
   return (
     <Card className="w-full mb-4 sm:mb-6">

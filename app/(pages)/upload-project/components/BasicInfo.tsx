@@ -31,23 +31,38 @@ export function BasicInfo({
   onRepoSelect
 }: BasicInfoProps) {
   const departments = [
-    'Computer Science',
-    'Electronics and Communication',
-    'Mechanical',
-    'Civil',
-    'Electrical',
-    'Chemical',
+    'Aeronautical Engineering',
+    'Automobile Engineering',
+    'Biomedical Engineering',
     'Biotechnology',
+    'Chemical Engineering',
+    'Civil Engineering',
+    'Computer Science & Engineering',
+    'Computer Science & Engineering (Cyber Security)',
+    'Computer Science & Business Systems',
+    'Computer Science & Design',
+    'Electrical & Electronics Engineering',
+    'Electronics & Communication Engineering',
+    'Food Technology',
+    'Information Technology',
+    'Artificial Intelligence & Machine Learning',
+    'Artificial Intelligence & Data Science',
+    'Mechanical Engineering',
+    'Mechatronics Engineering',
+    'Robotics & Automation',
+    'Humanities & Sciences',
+    'Management Studies',
     'Other'
   ]
 
   const clubs = [
-    'Coding Club',
-    'Robotics Club',
-    'IEEE Student Branch',
-    'Innovation Club',
-    'Research Club',
-    'Design Club',
+
+    'IEEE CIS',
+    'Intellexa',
+    'DevsREC',
+    'ELITE',
+    'GDG',
+    'Cybersentinals REC',
     'Other'
   ]
 

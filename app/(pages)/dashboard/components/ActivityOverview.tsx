@@ -3,8 +3,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Activity, Code, GitPullRequest, GitMerge } from "lucide-react";
+import { Activity, Code, GitPullRequest } from "lucide-react";
 
 interface Project {
   id: string;
@@ -13,67 +12,57 @@ interface Project {
   githubUrl: string;
   techStack: string[];
   imageUrl: string | null;
-  users: {
-    user: {
-      name: string;
-      githubAvatarUrl: string | null;
-      githubUsername: string;
-    };
-    role: string;
-  }[];
-  language: string;
-  pullRequests: number;
-  stars: number;
 }
 
 interface ActivityOverviewProps {
-  ownedProjects: Project[];
-  contributedProjects: Project[];
+  projects?: Array<{
+    project: Project;
+    role: string;
+  }>;
+  points?: number;
 }
 
-export function ActivityOverview({ ownedProjects, contributedProjects }: ActivityOverviewProps) {
+export function ActivityOverview({ projects = [], points = 0 }: ActivityOverviewProps) {
+  const ownedProjects = projects.filter(p => p.role === 'OWNER');
+  const contributedProjects = projects.filter(p => p.role !== 'OWNER');
+
   return (
     <Card className="w-full mb-4 sm:mb-6 bg-card">
-      <CardHeader className="space-y-1">
+      <CardHeader className="space-y-1 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">Activity Overview</h2>
         <p className="text-sm text-muted-foreground">Track your project contributions and activity</p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Total Projects</span>
-            <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-              <Activity size={14} className="mr-1" />
-              {ownedProjects.length}
+      <CardContent className="space-y-4 px-4 sm:px-6">
+        <Card className="bg-muted p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Activity size={18} className="text-muted-foreground flex-shrink-0" />
+              <span className="font-medium">Contribution Points</span>
+            </div>
+            <Badge variant="secondary" className="bg-secondary text-secondary-foreground w-fit">
+              {points} points
             </Badge>
           </div>
-          <Progress value={ownedProjects.length} max={10} className="h-2 bg-secondary" />
-        </div>
+          <p className="text-xs text-muted-foreground mt-2">Points reflect your overall contribution to the platform</p>
+        </Card>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Card className="bg-muted">
-            <CardContent className="flex flex-col items-center p-3 sm:p-4">
-              <Code size={20} className="mb-2 text-muted-foreground w-5 h-5 sm:w-6 sm:h-6" />
-              <Badge variant="secondary" className="text-base sm:text-lg font-semibold bg-secondary text-secondary-foreground">
+            <CardContent className="flex flex-col items-center p-4">
+              <Code size={24} className="mb-2 text-muted-foreground" />
+              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground px-3 py-1">
                 {ownedProjects.length}
               </Badge>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">Projects Posted</p>
+              <p className="text-sm text-muted-foreground mt-2">Projects Created</p>
             </CardContent>
           </Card>
           <Card className="bg-muted">
-            <CardContent className="flex flex-col items-center p-3 sm:p-4">
-              <GitPullRequest size={20} className="mb-2 text-muted-foreground w-5 h-5 sm:w-6 sm:h-6" />
-              <Badge variant="secondary" className="text-base sm:text-lg font-semibold bg-secondary text-secondary-foreground">
+            <CardContent className="flex flex-col items-center p-4">
+              <GitPullRequest size={24} className="mb-2 text-muted-foreground" />
+              <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground px-3 py-1">
                 {contributedProjects.length}
               </Badge>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">Projects Contributed</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-muted">
-            <CardContent className="flex flex-col items-center p-3 sm:p-4">
-              <GitMerge size={20} className="mb-2 text-muted-foreground w-5 h-5 sm:w-6 sm:h-6" />
-              <Badge variant="secondary" className="text-base sm:text-lg font-semibold bg-secondary text-secondary-foreground">0</Badge>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2 text-center">Pull Requests Merged</p>
+              <p className="text-sm text-muted-foreground mt-2">Projects Contributed</p>
             </CardContent>
           </Card>
         </div>

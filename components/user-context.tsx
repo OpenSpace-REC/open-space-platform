@@ -14,6 +14,10 @@ export type User = {
   githubProfileUrl?: string;
   githubUsername?: string;
   joinDate?: string;
+  points?: number;
+  projectsPosted?: number;
+  projectsContributed?: number;
+  techStack?: string[];
   projects?: {
     role: string;
     project: {
@@ -28,43 +32,24 @@ export type User = {
 } | null;
 
 export interface UserContextType {
-  user: {
-    role: string;
-    id: string;
-    name: string;
-    bio: string | null;
-    email: string;
-    githubAvatarUrl?: string;
-    rank?: string;
-    githubProfileUrl?: string;
-    githubUsername?: string;
-    joinDate?: string;
-    projects?: {
-      role: string;
-      project: {
-        id: string;
-        name: string;
-        description: string | null;
-        githubUrl: string;
-        techStack: string[];
-        imageUrl: string | null;
-      };
-    }[];
-  } | null;
+  user: User | null;
   updateUser: (user: User) => void;
-  setUser: Dispatch<SetStateAction<User>>;
   isLoading: boolean;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType>({
+  user: null,
+  updateUser: () => {},
+  isLoading: true
+});
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true);
 
-  const updateUser = (updatedUser: User) => {
-    setUser(updatedUser);
+  const updateUser = (newUser: User) => {
+    setUser(newUser);
   };
 
   useEffect(() => {
@@ -91,16 +76,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [session, status]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, updateUser, isLoading }}>
+    <UserContext.Provider value={{ user, updateUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );
 }
 
-export function useUser() {
+export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
-}
+};

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FaGoogle } from "react-icons/fa";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { signOut as signOutAuth } from 'next-auth/react';
 import { Input } from "@/components/ui/input";
 import SignIn from "@/components/auth/sign-in";
 import SignOut from "@/components/auth/sign-out";
@@ -18,76 +19,21 @@ export default function SignUpPage() {
     const userEmail = session?.user?.email || "";
     const googleId = session?.googleId || "";
     const { toast } = useToast();
-    const [isAllowed, setIsAllowed] = useState(false);
-    const [hasCheckedAccess, setHasCheckedAccess] = useState(false);
-
-    const checkAllowedEmail = useCallback(async () => {
-        if (!session?.user?.email || hasCheckedAccess) return;
-        
-        try {
-            const response = await fetch('/api/check-access', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: session.user.email
-                }),
-            });
-
-            setHasCheckedAccess(true);
-
-            if (response.ok) {
-                setIsAllowed(true);
-                toast({
-                    title: "Access Granted",
-                    description: "Welcome to Open-Space Beta!",
-                    variant: "default",
-                    duration: 5000,
-                });
-            } else {
-                toast({
-                    title: "Access Denied",
-                    description: "Sorry, this app is currently in early access. You're not on the allowed list.",
-                    variant: "destructive",
-                    duration: 5000,
-                });
-                setTimeout(() => {
-                    signOut({ 
-                        callbackUrl: '/',
-                        redirect: true 
-                    });
-                }, 2000);
-            }
-        } catch (error) {
-            console.error("Error checking access:", error);
-            setHasCheckedAccess(true);
-            toast({
-                title: "Error",
-                description: "Something went wrong while checking access.",
-                variant: "destructive",
-                duration: 5000,
-            });
-        }
-    }, [session?.user?.email, hasCheckedAccess, toast]);
 
     useEffect(() => {
         if (session?.user?.name) {
             setName(session.user.name);
         }
-        if (session?.user?.email && !hasCheckedAccess) {
-            checkAllowedEmail();
-        }
-    }, [session, checkAllowedEmail, hasCheckedAccess]);
+    }, [session]);
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
     };
 
-    const navigateToDashboard = useCallback(() => {
+    const navigateToDashboard = () => {
         console.log("Navigating to dashboard...");
         router.replace("/dashboard");
-    }, [router]);
+    };
 
     const handleConfirm = async () => {
         if (!session) return;
@@ -162,7 +108,7 @@ export default function SignUpPage() {
                         </SignIn>
                     )}
 
-                    {session && isAllowed && (
+                    {session && (
                         <div className="flex flex-col gap-3 sm:gap-4">
                             <div>
                                 <Input

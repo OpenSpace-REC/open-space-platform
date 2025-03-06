@@ -10,6 +10,11 @@ interface GitHubUser {
 interface PullRequest {
   user: GitHubUser;
   merged: boolean;
+  base: {
+    repo: {
+      full_name: string;
+    };
+  };
 }
 
 interface Repository {
@@ -68,8 +73,57 @@ async function updateUserPoints(githubUsername: string, points: number) {
   }
 }
 
+async function addContributorRole(githubUsername: string, repoFullName: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { githubUsername },
+      select: { id: true }
+    });
+
+    if (!user) {
+      console.log(`User not found for GitHub username: ${githubUsername}`);
+      return null;
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { githubUrl: `https://github.com/${repoFullName}` },
+      select: { id: true }
+    });
+
+    if (!project) {
+      console.log(`Project not found for repo: ${repoFullName}`);
+      return null;
+    }
+
+    const existingRole = await prisma.projectUser.findFirst({
+      where: {
+        userId: user.id,
+        projectId: project.id
+      }
+    });
+
+    if (existingRole) {
+      console.log(`User ${githubUsername} already has a role in project ${project.id}`);
+      return existingRole;
+    }
+
+    const projectUser = await prisma.projectUser.create({
+      data: {
+        userId: user.id,
+        projectId: project.id,
+        role: 'CONTRIBUTOR'
+      }
+    });
+
+    return projectUser;
+  } catch (error) {
+    console.error('Error adding contributor role:', error);
+    throw error;
+  }
+}
+
 async function handlePullRequestEvent(payload: PullRequestPayload) {
-  const { action, pull_request, repository } = payload;
+  const { action, pull_request } = payload;
   const githubUsername = pull_request.user.login;
 
   // Handle PR opened
@@ -80,6 +134,7 @@ async function handlePullRequestEvent(payload: PullRequestPayload) {
   // Handle PR merged
   if (action === 'closed' && pull_request.merged) {
     await updateUserPoints(githubUsername, POINTS_CONFIG.PULL_REQUEST_MERGED);
+    await addContributorRole(githubUsername, pull_request.base.repo.full_name);
   }
 }
 
