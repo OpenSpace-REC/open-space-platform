@@ -270,6 +270,7 @@ export default function AllProjectsPage() {
         <ProjectsLoading />
       ) : (
         <ProjectsGrid
+          paginate
           projects={projects}
           onProjectClick={handleProjectClick}
         />

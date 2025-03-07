@@ -17,7 +17,7 @@ export const verifyGithubUsername = async (username: string): Promise<boolean> =
       headers: {
         Authorization: `Bearer ${token}`
       }
-    })
+    })  
     return response.status === 200
   } catch {
     return false

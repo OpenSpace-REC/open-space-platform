@@ -214,7 +214,7 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
   return (
     <Link href={projectLink}>
       <Card 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer h-full bg-zinc-900/90 hover:bg-zinc-900 border-zinc-800 hover:border-zinc-700"
+        className="group hover:shadow-lg transition-all duration-200 cursor-pointer text-zinc-800 h-full bg-grey-900/90 hover:bg-grey-900 border-grey-800 hover:border-grey-700 dark:bg-zinc-900/90 dark:hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-700"
         onClick={onClick}
       >
         <CardContent className="p-6">
@@ -237,7 +237,7 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <h3 className="text-xl font-semibold text-zinc-100 group-hover:text-white transition-colors truncate max-w-[200px]">
+                      <h3 className="text-xl font-semibold dark:text-zinc-100 dark:group-hover:text-white transition-colors truncate max-w-[200px]">
                         {truncateText(project.name, DISPLAY_LIMITS.title)}
                       </h3>
                     </TooltipTrigger>
@@ -302,7 +302,7 @@ export default function ProjectTile({ project, onClick, isEditable = false }: Pr
                 <Badge 
                   key={index} 
                   variant="secondary"
-                  className="bg-zinc-800/50 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/50 hover:border-zinc-700"
+                  className="bg-gray-900/90 hover:bg-gray-900 border-gray-800 hover:border-gray-700 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 text-zinc-300 border dark:border-zinc-700/50 dark:hover:border-zinc-700"
                 >
                   {tech}
                 </Badge>
