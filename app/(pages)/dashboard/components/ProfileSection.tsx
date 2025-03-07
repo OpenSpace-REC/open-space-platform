@@ -263,18 +263,20 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
           </Badge>
         </div>
 
-        {user.techStack && user.techStack.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-sm font-medium mb-2 text-center sm:text-left">Technologies Used</h3>
-            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-              {user.techStack.map((tech, index) => (
-                <Badge key={index} variant="secondary" className="bg-secondary text-secondary-foreground">
-                  {tech}
-                </Badge>
-              ))}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {user.techStack && user.techStack.length > 0 && (
+            <div className="w-full">
+              <h3 className="text-sm font-medium mb-2 text-center sm:text-left">Technologies Used</h3>
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                {user.techStack.map((tech, index) => (
+                  <Badge key={index} variant="secondary" className="bg-secondary text-secondary-foreground">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </CardHeader>
     </Card>
   );

@@ -24,7 +24,9 @@ import { CuratorTools } from './components/CuratorTools';
 import { ActivityOverview } from './components/ActivityOverview';
 import { ProjectsSection } from './components/ProjectsSection';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import DashboardLoading from './loading';
+import { usePlatformAccess } from '@/hooks/usePlatformAccess';
 
 interface ProjectUser {
   user: {
@@ -92,9 +94,12 @@ const statusOptions = [
 
 export default function DashboardPage() {
   const { user, updateUser, isLoading } = useUser();
+  const { hasAccess, isLoading: accessLoading } = usePlatformAccess();
   const router = useRouter();
   const statusOptions: StatusType[] = ['DRAFT', 'IN_PROGRESS', 'COMPLETED'];
   const [projectIds, setProjectIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<EditableProfileData | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isCreatingTag, setIsCreatingTag] = useState(false);
@@ -142,11 +147,48 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  if (isLoading) {
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      if (!user?.email) return;
+
+      try {
+        const response = await fetch('/api/check-ban-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: user.email }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.error === 'User is banned') {
+            await signOut();
+            window.location.href = '/banned';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking ban status:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkBanStatus();
+  }, [user?.email]);
+
+  useEffect(() => {
+    if (!accessLoading && !hasAccess) {
+      router.push("/restricted");
+    }
+  }, [hasAccess, accessLoading, router]);
+
+  if (isLoading || accessLoading || loading) {
     return <DashboardLoading />;
   }
 
-  if (!user) {
+  if (!user || !hasAccess) {
     return null;
   }
 
@@ -322,41 +364,18 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8 bg-background">
-      {visitCount > 0 && visitCount <= 20 && (
-        <Card className="w-full bg-card border">
-          <CardHeader>
-            <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold">Welcome to Open-Space</h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Explore the features we've introduced! Check out the feature showcase to learn more.
-              </p>
-              <Button
-                className="w-full sm:w-auto mt-2"
-                onClick={() => window.location.href = "/get-started"}
-              >
-                Go to Feature Showcase
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-      )}
-      <div className="space-y-8">
+    <div className="container mx-auto p-4 min-w-0">
+      <div className="grid gap-4 min-w-0">
         <ProfileSection user={user} updateUser={updateUser} />
-        
-        {hasTaggingPermissions(user.role) && (
-          <CuratorTools hasTaggingPermissions={true} />
+        {(user.role === 'CURATOR' || user.role === 'ADMIN') && (
+          <CuratorTools user={user} />
         )}
-
         <ActivityOverview 
-          ownedProjects={ownedProjects}
-          contributedProjects={contributedProjects}
+          projects={user.projects}
+          points={user.points || 0}
         />
 
-        <ProjectsSection 
-          ownedProjects={ownedProjects}
-          contributedProjects={contributedProjects}
-        />
+        <ProjectsSection user={user} />
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ model User {
   githubAccessToken String?
   points            Int           @default(0)
   techStack         String[]      @default([])
+  banned            Boolean       @default(false)
   projectTags       ProjectTag[]
   projects          ProjectUser[]
 }
@@ -32,21 +33,21 @@ model Counter {
 }
 
 model Project {
-  id               String   @id 
+  id               String               @id
   name             String
   description      String?
   problemStatement String?
-  githubUrl        String?  @unique
+  githubUrl        String?              @unique
   demoUrl          String?
   techStack        String[]
   imageUrl         String?
   status           String
   projectType      String
-  department       String?
-  club             String?
   keyFeatures      String[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  club             String?
+  department       String?
   pendingUsers     PendingProjectUser[]
   projectImages    ProjectImage[]
   resources        ProjectResource[]
@@ -137,6 +138,13 @@ model VotingStatus {
   startTime DateTime?
   endTime   DateTime?
   updatedAt DateTime  @updatedAt
+}
+
+model Settings {
+  id                 String   @id @default("app_settings")
+  leaderboardEnabled Boolean  @default(true)
+  lastModified       DateTime @default(now()) @updatedAt
+  adminOnlyAccess    Boolean  @default(false)
 }
 
 enum UserRole {

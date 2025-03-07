@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Github, Mail, Calendar, Edit3, Code, GitPullRequest, GitMerge, Activity } from "lucide-react";
 import { useUser } from '@/components/user-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import ProjectCard from '@/components/ui/project-card';
+import ProjectCard from '@/components/ui/project-tile';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -26,6 +26,26 @@ interface Tag {
   name: string;
   description?: string;
   createdAt: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  githubUrl: string;
+  techStack: string[];
+  imageUrl: string | null;
+  users: {
+    user: {
+      name: string;
+      githubAvatarUrl: string | null;
+      githubUsername: string;
+    };
+    role: string;
+  }[];
+  language: string;
+  pullRequests: number;
+  stars: number;
 }
 
 interface ProfileData {
@@ -52,6 +72,14 @@ interface ProfileData {
         techStack: string[];
         votes: Vote[];
         tags: Tag[];
+        users: Array<{
+          user: {
+            name: string;
+            githubAvatarUrl: string | null;
+            githubUsername: string;
+          };
+          role: string;
+        }>;
       };
       role: string;
     }>;
@@ -199,24 +227,26 @@ export default function ProfilePage() {
             )}
 
             <div>
-              <h2 className="text-lg font-semibold mb-2">Contribution Overview</h2>
+              <h2 className="text-lg font-semibold mb-2">Activity Overview</h2>
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-muted-foreground">Total Points</span>
+                <Card className="bg-muted p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Activity size={18} className="text-muted-foreground" />
+                      <span className="font-medium">Contribution Points</span>
+                    </div>
                     <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                      <Activity size={14} className="mr-1" />
-                      {user.points}
+                      {user.points} points
                     </Badge>
                   </div>
-                  <Progress value={contributionProgress} max={100} className="h-2 bg-secondary" />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <p className="text-xs text-muted-foreground mt-2">Points reflect your overall contribution to the platform</p>
+                </Card>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Card className="bg-muted">
                     <CardContent className="flex flex-col items-center p-4">
                       <Code size={24} className="mb-2 text-muted-foreground" />
                       <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.projectsPosted}</Badge>
-                      <p className="text-sm text-muted-foreground mt-2">Projects Posted</p>
+                      <p className="text-sm text-muted-foreground mt-2">Projects Created</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-muted">
@@ -224,13 +254,6 @@ export default function ProfilePage() {
                       <GitPullRequest size={24} className="mb-2 text-muted-foreground" />
                       <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.projectsContributed}</Badge>
                       <p className="text-sm text-muted-foreground mt-2">Projects Contributed</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-muted">
-                    <CardContent className="flex flex-col items-center p-4">
-                      <GitMerge size={24} className="mb-2 text-muted-foreground" />
-                      <Badge variant="secondary" className="text-lg font-semibold bg-secondary text-secondary-foreground">{user.tagsCreated}</Badge>
-                      <p className="text-sm text-muted-foreground mt-2">Tags Created</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -247,17 +270,32 @@ export default function ProfilePage() {
               <TabsContent value="posted" className="mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {postedProjects.map(({ project }) => (
-                    <ProjectCard 
-                      key={project.id} 
-                      project={{
-                        id: project.id,
-                        name: project.name,
-                        description: project.description || '',
-                        language: project.techStack[0] || 'N/A',
-                        pullRequests: project.tags.length,
-                        stars: project.votes.length
-                      }} 
-                    />
+                    <div key={project.id} className="w-full">
+                      <ProjectCard 
+                        project={{
+                          id: project.id,
+                          name: project.name,
+                          description: project.description || '',
+                          githubUrl: '',
+                          techStack: project.techStack,
+                          imageUrl: null,
+                          users: [{
+                            user: {
+                              name: user.name,
+                              githubAvatarUrl: user.githubAvatarUrl || null,
+                              githubUsername: user.githubUsername || ''
+                            },
+                            role: 'OWNER'
+                          }],
+                          language: project.techStack[0] || 'N/A'
+                        }}
+                        onClick={() => {
+                          if (project.id) {
+                            window.location.href = `/project/${project.id}`;
+                          }
+                        }}
+                      />
+                    </div>
                   ))}
                   {postedProjects.length === 0 && (
                     <p className="text-muted-foreground col-span-2 text-center py-4">No projects posted yet</p>
@@ -267,17 +305,32 @@ export default function ProfilePage() {
               <TabsContent value="contributed" className="mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {contributedProjects.map(({ project }) => (
-                    <ProjectCard 
-                      key={project.id} 
-                      project={{
-                        id: project.id,
-                        name: project.name,
-                        description: project.description || '',
-                        language: project.techStack[0] || 'N/A',
-                        pullRequests: project.tags.length,
-                        stars: project.votes.length
-                      }} 
-                    />
+                    <div key={project.id} className="w-full">
+                      <ProjectCard 
+                        project={{
+                          id: project.id,
+                          name: project.name,
+                          description: project.description || '',
+                          githubUrl: '',
+                          techStack: project.techStack,
+                          imageUrl: null,
+                          users: [{
+                            user: {
+                              name: user.name,
+                              githubAvatarUrl: user.githubAvatarUrl || null,
+                              githubUsername: user.githubUsername || ''
+                            },
+                            role: 'CONTRIBUTOR'
+                          }],
+                          language: project.techStack[0] || 'N/A'
+                        }}
+                        onClick={() => {
+                          if (project.id) {
+                            window.location.href = `/project/${project.id}`;
+                          }
+                        }}
+                      />
+                    </div>
                   ))}
                   {contributedProjects.length === 0 && (
                     <p className="text-muted-foreground col-span-2 text-center py-4">No contributions yet</p>
