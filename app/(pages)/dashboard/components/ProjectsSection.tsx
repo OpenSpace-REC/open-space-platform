@@ -58,7 +58,7 @@ export function ProjectsSection({ user }: ProjectsSectionProps) {
     }));
 
   return (
-    <Card className="w-full">
+    <Card className="w-full p-2">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 p-3 sm:p-4">
         <div>
           <h2 className="text-base sm:text-lg font-semibold">Your Projects</h2>

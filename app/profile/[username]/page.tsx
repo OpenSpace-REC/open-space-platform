@@ -172,8 +172,9 @@ export default function ProfilePage() {
 
                 <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
                   <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Points: {user.points}</Badge>
-                  <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Role: {user.role}</Badge>
-                  <Badge variant="outline" className="border-accent text-accent-foreground">Active</Badge>
+                  {(user.role === 'admin' || user.role === 'curator') && (
+                    <Badge variant="secondary" className="bg-secondary text-secondary-foreground">{user.role}</Badge>
+                  )}
                 </div>
                 <p className="mt-2 text-muted-foreground">{user.bio || "No bio available"}</p>
               </div>

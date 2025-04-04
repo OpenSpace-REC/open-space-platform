@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, memo } from 'react';
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit3, Mail, Github, Calendar, Share2 } from "lucide-react";
@@ -32,7 +32,7 @@ interface ProfileSectionProps {
 interface EditableProfileData {
   name: string;
   bio: string | null;
-  techStack: string;
+  techStack: string[];
 }
 
 interface ValidationErrors {
@@ -40,22 +40,14 @@ interface ValidationErrors {
   bio?: string;
 }
 
-export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
+export const ProfileSection = memo(function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editableData, setEditableData] = useState<EditableProfileData>({
     name: user.name,
     bio: user.bio,
-    techStack: user.techStack?.join(',') || ''
+    techStack: user.techStack || []
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
-
-  useEffect(() => {
-    setEditableData({
-      name: user.name,
-      bio: user.bio,
-      techStack: user.techStack?.join(',') || ''
-    });
-  }, [user]);
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -81,7 +73,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
         body: JSON.stringify({
           name: editableData.name.trim(),
           bio: editableData.bio?.trim() || null,
-          techStack: editableData.techStack.split(',').filter(tech => tech.trim()),
+          techStack: editableData.techStack,
         }),
       });
 
@@ -102,7 +94,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
       setEditableData({
         name: user.name,
         bio: user.bio,
-        techStack: user.techStack?.join(',') || ''
+        techStack: user.techStack || []
       });
       setErrors({});
     }
@@ -120,11 +112,11 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   };
 
   const addTechStack = (tech: string) => {
-    const currentTechs = editableData.techStack.split(',').filter(t => t.trim());
+    const currentTechs = editableData.techStack;
     if (!currentTechs.includes(tech)) {
       setEditableData(prev => ({
         ...prev,
-        techStack: [...currentTechs, tech].join(',')
+        techStack: [...currentTechs, tech]
       }));
     }
   };
@@ -132,10 +124,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
   const removeTech = (techToRemove: string) => {
     setEditableData(prev => ({
       ...prev,
-      techStack: prev.techStack
-        .split(',')
-        .filter(tech => tech.trim() !== techToRemove)
-        .join(',')
+      techStack: prev.techStack.filter(tech => tech !== techToRemove)
     }));
   };
 
@@ -148,7 +137,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
-          <div className="text-center sm:text-left flex-grow space-y-3">
+          <div className="text-center sm:text-left flex-grow space-y-2">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
               <h1 className="text-xl sm:text-2xl font-bold">{user.name}</h1>
               <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
@@ -202,7 +191,7 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
                       <div className="space-y-2">
                         <Label>Tech Stack</Label>
                         <TechStackSelector
-                          project={{ techStack: editableData.techStack }}
+                          techStack={editableData.techStack.join(', ')}
                           addTechStack={addTechStack}
                           removeTech={removeTech}
                         />
@@ -228,10 +217,11 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                Rank: {user.rank || 'Beginner'}
-              </Badge>
-              <Badge variant="outline" className="border-accent text-accent-foreground">Active</Badge>
+              {user.rank && (user.rank === 'admin' || user.rank === 'curator') && (
+                <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                  {user.rank}
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">{user.bio || "No bio available"}</p>
           </div>
@@ -280,4 +270,10 @@ export function ProfileSection({ user, updateUser }: ProfileSectionProps) {
       </CardHeader>
     </Card>
   );
-} 
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.user?.name === nextProps.user?.name &&
+    prevProps.user?.bio === nextProps.user?.bio &&
+    prevProps.user?.email === nextProps.user?.email
+  );
+});

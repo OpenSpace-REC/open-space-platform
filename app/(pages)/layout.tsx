@@ -11,7 +11,7 @@ const CommonLayout = ({ children }: { children: React.ReactNode }) => {
             
             <Navbar/>
             {/* Fixes overflow in mobile screens */}
-            <main className="flex-1 p-4"> 
+            <main className="flex-1 "> 
                 {children}
             </main>
         </div>
