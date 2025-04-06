@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 
@@ -8,5 +10,5 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
-  redirect(process.env.NEXT_PUBLIC_BASE_URL!);
+  redirect("https://home.open-space.xyz");
 }
