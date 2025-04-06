@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/components/user-context';
 
 export function usePlatformAccess() {
-    const [isAdminOnly, setIsAdminOnly] = useState(false);
-    const [hasAccess, setHasAccess] = useState(false);
+    const [isAdminOnly, setIsAdminOnly] = useState<boolean | undefined>(undefined);
+    const [hasAccess, setHasAccess] = useState<boolean | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { user } = useUser();
 
     useEffect(() => {
         const checkPlatformAccess = async () => {
+            setIsLoading(true);
             if (!user) {
+                setHasAccess(undefined);
                 setIsLoading(false);
                 return;
             }
@@ -25,8 +27,9 @@ export function usePlatformAccess() {
                 setHasAccess(data.hasAccess);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
-                setIsAdminOnly(false);
-                setHasAccess(true);
+                // Don't set default values on error, maintain undefined state
+                setHasAccess(undefined);
+                setIsAdminOnly(undefined);
             } finally {
                 setIsLoading(false);
             }

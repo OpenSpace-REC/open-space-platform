@@ -62,26 +62,26 @@ export async function middleware(request: NextRequest) {
     }
 
     
-    const settings = await prisma.settings.findUnique({
-      where: { id: 'app_settings' }
-    });
+    // const settings = await prisma.settings.findUnique({
+    //   where: { id: 'app_settings' }
+    // });
 
     
-    if (settings?.adminOnlyAccess === true) {
+    // if (settings?.adminOnlyAccess === true) {
      
-      if (user.role !== 'ADMIN') {
+    //   if (user.role !== 'ADMIN') {
      
-        if (request.nextUrl.pathname.startsWith('/api/')) {
-          return NextResponse.json(
-            { error: 'Platform is currently restricted to admin users only' },
-            { status: 403 }
-          )
-        }
+    //     if (request.nextUrl.pathname.startsWith('/api/')) {
+    //       return NextResponse.json(
+    //         { error: 'Platform is currently restricted to admin users only' },
+    //         { status: 403 }
+    //       )
+    //     }
         
 
-        return NextResponse.redirect(new URL('/restricted', request.url))
-      }
-    }
+    //     return NextResponse.redirect(new URL('/restricted', request.url))
+    //   }
+    // }
 
     return response
   } catch (error) {
