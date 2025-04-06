@@ -133,16 +133,26 @@ export default function DashboardPage() {
   }, [user?.email]);
 
   useEffect(() => {
-    if (!accessLoading && !hasAccess) {
+    // Only redirect if:
+    // 1. Not loading
+    // 2. We have a definitive false for hasAccess
+    // 3. User exists
+    if (!accessLoading && hasAccess === false && user) {
       router.push("/restricted");
     }
-  }, [hasAccess, accessLoading, router]);
+  }, [hasAccess, accessLoading, router, user]);
 
-  if (isLoading || accessLoading || loading) {
+  // Show loading state while:
+  // 1. Initial loading
+  // 2. Access check loading
+  // 3. Ban status loading
+  // 4. hasAccess is undefined (still determining)
+  if (isLoading || accessLoading || loading || hasAccess === undefined) {
     return <DashboardLoading />;
   }
 
-  if (!user || !hasAccess) {
+  // Only return null if we definitely don't have access
+  if (!user || hasAccess === false) {
     return null;
   }
 
