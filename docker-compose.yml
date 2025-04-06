@@ -1,3 +1,4 @@
+version: '3.9'
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Docker Compose reference guide at
 # https://docs.docker.com/go/compose-spec-reference/
@@ -8,36 +9,50 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  server:
-    build:
-      context: .
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: production
-    ports:
-      - 3000:3000
-    depends_on:
-      db:
-        condition: service_healthy
-        
   db:
     image: postgres:latest
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=open-space
+    container_name: postgres
+    hostname: db
     ports:
-      - "5432:5432"
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: open-space
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deploy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/open-space?schema=public
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000/}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID}
+      AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
+      GITHUB_ID: ${AUTH_GITHUB_ID}
+      GITHUB_SECRET: ${AUTH_GITHUB_SECRET}
+      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET}
+      ALLOWED_USERS: ${ALLOWED_USERS}
+    ports:
+      - 3000:3000
+      - 5555:5555
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
-
