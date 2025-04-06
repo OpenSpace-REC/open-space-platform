@@ -50,12 +50,45 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
+        const session = await auth();
+
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const settings = await prisma.settings.findUnique({
             where: { id: 'app_settings' }
         });
 
+        // First check if user is admin
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            select: { role: true }
+        });
+
+        // Admins always have access
+        if (user?.role === 'ADMIN') {
+            return NextResponse.json({ 
+                adminOnlyAccess: settings?.adminOnlyAccess ?? false,
+                hasAccess: true
+            });
+        }
+
+        // For non-admins, check allowlist if in admin-only mode
+        if (settings?.adminOnlyAccess) {
+            const allowedEmails = process.env.ALLOWED_USERS?.split(',') || [];
+            const hasAccess = allowedEmails.includes(session.user.email);
+            
+            return NextResponse.json({ 
+                adminOnlyAccess: true,
+                hasAccess
+            });
+        }
+
+        // If not in admin-only mode, everyone has access
         return NextResponse.json({ 
-            adminOnlyAccess: settings?.adminOnlyAccess ?? false 
+            adminOnlyAccess: false,
+            hasAccess: true
         });
     } catch (error) {
         console.error('Error getting platform access status:', error);
