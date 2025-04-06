@@ -3,6 +3,7 @@ import { useUser } from '@/components/user-context';
 
 export function usePlatformAccess() {
     const [isAdminOnly, setIsAdminOnly] = useState(false);
+    const [hasAccess, setHasAccess] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { user } = useUser();
@@ -21,10 +22,11 @@ export function usePlatformAccess() {
                 }
                 const data = await response.json();
                 setIsAdminOnly(data.adminOnlyAccess);
+                setHasAccess(data.hasAccess);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
-
                 setIsAdminOnly(false);
+                setHasAccess(true);
             } finally {
                 setIsLoading(false);
             }
@@ -32,8 +34,6 @@ export function usePlatformAccess() {
 
         checkPlatformAccess();
     }, [user]);
-
-    const hasAccess = !isLoading && (!isAdminOnly || user?.role === 'ADMIN');
 
     return { isAdminOnly, isLoading, error, hasAccess };
 }
