@@ -134,6 +134,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      prisma:
+        specifier: ^5.19.1
+        version: 5.22.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -183,9 +186,6 @@ importers:
       postcss:
         specifier: ^8
         version: 8.5.3
-      prisma:
-        specifier: ^5.19.1
-        version: 5.22.0
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.17(ts-node@10.9.2(@types/node@20.17.30)(typescript@5.8.2))
