@@ -17,6 +17,7 @@ import { ProjectResources } from '../../upload-project/components/ProjectResourc
 import { SubmitDialog } from '../../upload-project/components/SubmitDialog'
 import { Project, ProjectResource, ProjectUser, Repository } from '../../upload-project/components/types'
 import { isValidPostImageUrl, verifyGithubUsername } from '../../upload-project/components/utils'
+import TechStackSelector from '@/components/ui/dymanic-techstack';
 
 export default function EditProjectPage({ params }: { params: { id: string } }) {
   const { user } = useUser();
@@ -43,6 +44,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
   const [newProjectUser, setNewProjectUser] = useState({ githubUsername: '', role: 'CONTRIBUTOR' as const });
   const [errors, setErrors] = useState<Partial<typeof project & { projectUsers: string }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [repositories, setRepositories] = useState<Repository[]>([]);
@@ -251,7 +253,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
       return;
     }
 
-    setIsSubmitting(true);
+    setIsDeleting(true);
     try {
       const response = await fetch(`/api/projects/${params.id}`, {
         method: 'DELETE',
@@ -272,7 +274,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setIsDeleting(false);
     }
   };
 
@@ -321,14 +323,14 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
               <p className="text-muted-foreground">Update your project details</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             <Button 
               variant="destructive"
               onClick={handleDelete}
-              disabled={isSubmitting}
-              className="w-[150px]"
+              disabled={isDeleting}
+              className="w-full md:w-[150px]"
             >
-              {isSubmitting ? (
+              {isDeleting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Deleting...
@@ -343,7 +345,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
             <Button 
               onClick={handleSubmit} 
               disabled={isSubmitting}
-              className="w-[150px]"
+              className="w-full md:w-[150px]"
             >
               {isSubmitting ? (
                 <>
@@ -416,6 +418,7 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
               addTechStack={addTechStack}
               removeTech={removeTech}
             />
+            
           </TabsContent>
 
           <TabsContent value="features">

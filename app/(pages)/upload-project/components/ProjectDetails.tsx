@@ -88,12 +88,12 @@ export function ProjectDetails({
         <div className="space-y-2">
           <Label>Tech Stack</Label>
           <TechStackSelector 
-            project={{ techStack: project.techStack }} 
-            addTechStack={addTechStack} 
-            removeTech={removeTech} 
+            techStack={project.techStack}
+            addTechStack={addTechStack}
+            removeTech={removeTech}
           />
         </div>
       </CardContent>
     </Card>
   )
-} 
+}

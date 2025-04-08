@@ -53,6 +53,18 @@ export default function SignUpPage() {
 
             console.log("Create user response status:", response.status);
 
+            if (response.status === 403) {
+                toast({
+                    title: "Access Restricted",
+                    description: "You don't have access to the platform at this time.",
+                    variant: "destructive",
+                    duration: 5000,
+                });
+                await signOutAuth();
+                router.push("/restricted");
+                return;
+            }
+
             if (response.status === 302) {
                 toast({
                     title: "Next Step",

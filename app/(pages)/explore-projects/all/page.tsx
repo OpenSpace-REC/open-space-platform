@@ -199,7 +199,7 @@ export default function AllProjectsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-8 space-y-8 p-4">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">All Projects</h1>
       </div>

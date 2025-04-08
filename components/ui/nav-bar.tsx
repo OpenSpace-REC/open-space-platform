@@ -60,6 +60,21 @@ export default function Navbar() {
           </NavigationMenuLink>
         </Link>
       </NavigationMenuItem>
+      <NavigationMenuItem>
+        <Link href="/get-started" legacyBehavior passHref>
+          <NavigationMenuLink>
+            <div className="relative group">
+              <div className="absolute inset-0 dark:bg-white/10 bg-primary/10 rounded-full transition-all" />
+              <Button 
+                variant="ghost"
+                className="relative px-4 py-2 text-sm font-medium dark:text-white text-primary border dark:border-white/20 border-primary/20 rounded-full transition-all duration-300 hover:bg-primary/10 dark:hover:bg-white/10"
+              >
+                Get Started
+              </Button>
+            </div>
+          </NavigationMenuLink>
+        </Link>
+      </NavigationMenuItem>
     </>
   );
 
@@ -75,9 +90,9 @@ export default function Navbar() {
         {session ? (
           <>
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-6">
               <NavigationMenu>
-                <NavigationMenuList className="flex space-x-4">
+                <NavigationMenuList className="flex items-center space-x-4">
                   <NavItems />
                 </NavigationMenuList>
               </NavigationMenu>
@@ -179,12 +194,17 @@ export default function Navbar() {
                               Explore Projects
                             </Button>
                           </Link>
+                          <Link onClick={() => setSheetState(prev => !prev)} href="/get-started" className="w-full h-[50px]">
+                            <Button variant="ghost" className="w-full justify-start text-base">
+                              Get Started
+                            </Button>
+                          </Link>
                         </nav>
                       </div>
                     </div>
 
                     <div className="border-t border-border p-4 flex items-center justify-between w-full">
-                      <Link href="/profile" className="w-[44px] h-[44px] bg-gray-50/10 rounded-full text-base flex items-center justify-center">
+                      <Link href={`/profile/${user?.githubUsername}`} className="w-[44px] h-[44px] bg-gray-50/10 rounded-full text-base flex items-center justify-center">
                         <Button variant="ghost" className="w-full h-full justify-start text-base p-3">
                           <UserIcon className="h-[40px] w-[40px] block scale-95" />
                         </Button>

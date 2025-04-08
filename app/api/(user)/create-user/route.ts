@@ -8,9 +8,36 @@ export async function POST(request: NextRequest) {
 
         const { googleId, name, email } = reqBody;
 
-        
+        // Check platform access restrictions
+        const settings = await prisma.settings.findUnique({
+            where: { id: 'app_settings' }
+        });
+
+        if (settings?.adminOnlyAccess) {
+            const allowedEmails = process.env.ALLOWED_USERS?.split(',') || [];
+            const existingUser = await prisma.user.findUnique({
+                where: { email },
+                select: { role: true }
+            });
+
+            // Allow access if user is either admin or in allowlist
+            if (!allowedEmails.includes(email) && existingUser?.role !== 'ADMIN') {
+                return NextResponse.json(
+                    { message: "Platform access restricted" }, 
+                    { status: 403 }
+                );
+            }
+        }
+
+        // Check if user exists with full profile
         const existingUser = await prisma.user.findUnique({
-            where: { email }
+            where: { email },
+            select: { 
+                role: true,
+                githubUsername: true,
+                githubProfileUrl: true,
+                githubAvatarUrl: true
+            }
         });
 
         if (existingUser) {

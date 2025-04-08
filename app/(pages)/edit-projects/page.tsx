@@ -41,7 +41,7 @@ export default function EditProjectsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 p-4">
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Edit Projects</CardTitle>

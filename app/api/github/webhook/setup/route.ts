@@ -45,7 +45,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const webhookUrl = 'https://www.open-space.xyz/api/github/webhook/listen';
+    const baseUrl = process.env.BASE_URL || 'https://www.open-space.xyz';
+    const webhookUrl = `${baseUrl}/api/github/webhook/listen`;
+
 
     console.log('Webhook URL:', webhookUrl);
 
