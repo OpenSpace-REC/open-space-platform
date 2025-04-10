@@ -227,7 +227,10 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
+        cache: 'no-store',
         body: JSON.stringify({
           ...project,
           techStack: project.techStack.split(',').map(tech => tech.trim()).filter(Boolean),
@@ -235,9 +238,13 @@ export default function EditProjectPage({ params }: { params: { id: string } }) 
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to update project');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update project');
+      }
 
       setSubmitStatus('success');
+      router.refresh();
       router.push('/dashboard');
     } catch (error) {
       console.error('Error updating project:', error);
