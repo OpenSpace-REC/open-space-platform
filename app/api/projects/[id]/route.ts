@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ProjectMember, Resource } from '@/app/types/project';
+import { auth } from '@/lib/auth';
+import { Session } from 'next-auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 export async function GET(
   request: Request,
@@ -40,6 +43,22 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await auth();
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get the user from database to get their ID
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -57,6 +76,24 @@ export async function PATCH(
       resources,
       users,
     } = body;
+
+    // Verify project ownership
+    const existingProject = await prisma.project.findUnique({
+      where: { id: params.id },
+      include: { users: true },
+    });
+
+    if (!existingProject) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+
+    const isOwner = existingProject.users.some(
+      user => user.userId === dbUser.id && user.role === 'OWNER'
+    );
+
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
     // First, fetch all users by their GitHub usernames to get their actual IDs
     const userGithubUsernames = users.map((user: { githubUsername: string; role: string }) => user.githubUsername);
@@ -120,7 +157,14 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(updatedProject);
+    // Add cache control headers to response
+    return new NextResponse(JSON.stringify(updatedProject), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, must-revalidate',
+      },
+    });
   } catch (error) {
     console.error('Error updating project:', error);
     return NextResponse.json(

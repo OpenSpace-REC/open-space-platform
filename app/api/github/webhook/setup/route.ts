@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const baseUrl = process.env.BASE_URL || 'https://www.open-space.xyz';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://open-space.xyz';
     const webhookUrl = `${baseUrl}/api/github/webhook/listen`;
 
 
