@@ -10,7 +10,7 @@ We release patches for security vulnerabilities. Which versions are eligible for
 
 ## Reporting a Vulnerability
 
-Please report security vulnerabilities to [your-email@domain.com](mailto:your-email@domain.com).
+Please report security vulnerabilities to [openspace@rajalakshmi.edu.in](mailto:openspace@rajalakshmi.edu.in).
 
 We will acknowledge receipt of your vulnerability report and send you regular updates about our progress. If you have not received a response within 48 hours, please reach out to us again.
 
